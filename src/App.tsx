@@ -5,6 +5,7 @@ import LoginPage from "./pages/auth/login";
 import UnauthorizePage from "./pages/auth/unauthorize";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import RegisterPage from "./pages/auth/register";
+import UnImplementPage from "./pages/common/unImplement";
 
 function App() {
   const authContext = useAuth();
@@ -41,6 +42,8 @@ function App() {
       <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
         <Route path="/admin/home" element={<h1>Admin home</h1>} />
       </Route>
+
+      <Route path="*" element={<UnImplementPage />} />
     </Routes>
   );
 }
