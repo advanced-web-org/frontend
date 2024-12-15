@@ -16,7 +16,7 @@ import { useState } from "react";
 export function LoginForm() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const auth = useAuth();
@@ -25,12 +25,12 @@ export function LoginForm() {
     e.preventDefault(); // Prevent form default submission behavior
 
     try {
-      const user = await auth.signin(username, password); // Call the signin function from the AuthContext
+      const user = await auth.signin(phone, password); // Call the signin function from the AuthContext
       if (user) {
         navigate(`/${user.role}/home`); // Redirect to the user's home page based on their role
       }
     } catch (err) {
-      setError("Invalid username or password. Please try again."); // Display error message
+      setError("Invalid phone number or password. Please try again."); // Display error message
     }
   };
 
@@ -46,12 +46,12 @@ export function LoginForm() {
         <form onSubmit={handleLogin}>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label>Username</Label>
+              <Label>Phone number</Label>
               <Input
-                id="username"
+                id="phone"
                 type="text"
-                placeholder="quanlac_123"
-                onChange={(e) => setUsername(e.target.value)} // Update username state
+                placeholder="0333465433"
+                onChange={(e) => setPhone(e.target.value)}
                 required
               />
             </div>
@@ -59,7 +59,7 @@ export function LoginForm() {
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
                 <Link
-                  to="/auth/register"
+                  to="/auth/forgot-password"
                   className="ml-auto inline-block text-sm underline"
                 >
                   Forgot your password?
@@ -82,7 +82,7 @@ export function LoginForm() {
           </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
-            <Link to="#" className="underline">
+            <Link to="/auth/signup" className="underline">
               Sign up
             </Link>
           </div>

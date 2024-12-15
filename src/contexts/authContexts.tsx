@@ -9,6 +9,7 @@ import React, {
   useContext,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -38,6 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const isAuthenticated = !!user;
 
   const signup = async (
     fullName: string,
@@ -88,7 +90,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUser(null); // Clear the user state on logout
   };
 
-  const isAuthenticated = !!user;
+  const authContextValue = useMemo(() => {
+    return {
+      user,
+      signup,
+      signin,
+      signout,
+      isAuthenticated,
+    };
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -128,9 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // }, [user?.accessToken]);
 
   return (
-    <AuthContext.Provider
-      value={{ user, signup, signin, signout, isAuthenticated }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );
