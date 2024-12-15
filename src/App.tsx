@@ -1,36 +1,47 @@
-import LoginPage from "./pages/auth/login";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { AuthProvider } from "./contexts/authContexts";
-import ProtectedRoutes from "./utils/ProtectedRoutes";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useAuth } from "./contexts/authContexts";
+import LoginPage from "./pages/auth/login";
 import UnauthorizePage from "./pages/auth/unauthorize";
+import ProtectedRoutes from "./utils/ProtectedRoutes";
+import RegisterPage from "./pages/auth/register";
 
 function App() {
-  const queryClient = new QueryClient();
+  const authContext = useAuth();
+  const { user } = authContext;
+  const { isAuthenticated } = authContext;
 
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <Routes>
-            <Route path="/auth/login" element={<LoginPage />} />
-            <Route path="/unauthorized" element={<UnauthorizePage />} />
-            <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
-              <Route path="/user/home" element={<h1>User Home</h1>} />
-            </Route>
-            <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
-              <Route path="/employee/home" element={<h1>Emp home</h1>} />
-            </Route>
-            <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
-              <Route path="/admin/home" element={<h1>Admin home</h1>} />
-            </Route>
-          </Routes>
-        </AuthProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/auth/register" element={<RegisterPage />} />
+      <Route path="/unauthorized" element={<UnauthorizePage />} />
+
+      <Route
+        path="/"
+        element={
+          isAuthenticated ? (
+            <>
+              {user?.role === "user" && <Navigate to="/user/home" />}
+              {user?.role === "employee" && <Navigate to="/employee/home" />}
+              {user?.role === "admin" && <Navigate to="/admin/home" />}
+            </>
+          ) : (
+            <Navigate to="/auth/login" />
+          )
+        }
+      />
+
+      <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
+        <Route path="/user/home" element={<h1>User Home</h1>} />
+      </Route>
+      <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
+        <Route path="/employee/home" element={<h1>Emp home</h1>} />
+      </Route>
+      <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
+        <Route path="/admin/home" element={<h1>Admin home</h1>} />
+      </Route>
+    </Routes>
   );
 }
 
