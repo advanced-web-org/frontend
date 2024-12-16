@@ -75,8 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const { access_token, role } = response;
       const user = { phone, role, accessToken: access_token };
 
-      console.log("user", user);
-
       // Update user state with retrieved details
       setUser(user);
       return user;
@@ -101,12 +99,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [user, isAuthenticated]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchUser = async () => {
       try {
         // Make a backend API call to validate the session and fetch user details
         const userDetails = await ApiFetchUser();
         setUser(userDetails);
-        console.log("userDetails", userDetails);
       } catch (error) {
         console.error("Silent authentication failed", error);
         setUser(null);
@@ -116,6 +115,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     fetchUser(); // Try to authenticate on app load
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (loading) {

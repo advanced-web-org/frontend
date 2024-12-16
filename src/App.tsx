@@ -2,10 +2,12 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { useAuth } from "./contexts/authContexts";
 import LoginPage from "./pages/auth/login";
-import UnauthorizePage from "./pages/auth/unauthorize";
-import ProtectedRoutes from "./utils/ProtectedRoutes";
 import RegisterPage from "./pages/auth/register";
+import UnauthorizePage from "./pages/auth/unauthorize";
 import UnImplementPage from "./pages/common/unImplement";
+import Layout from "./pages/customer/components/layout";
+import { CustomerHomepage } from "./pages/customer/homepage";
+import ProtectedRoutes from "./utils/ProtectedRoutes";
 
 function App() {
   const authContext = useAuth();
@@ -34,7 +36,9 @@ function App() {
       />
 
       <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
-        <Route path="/user/home" element={<h1>User Home</h1>} />
+        <Route path="/user" element={<Layout />}>
+          <Route path="home" element={<CustomerHomepage />} />
+        </Route>
       </Route>
       <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
         <Route path="/employee/home" element={<h1>Emp home</h1>} />
