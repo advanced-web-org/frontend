@@ -14,32 +14,52 @@ interface User {
   accessToken?: string;
 }
 
-export function signup({ fullname, email, phone, password }: User) {
+export async function signup({ fullname, email, phone, password }: User) {
   // Simulate a signup request
 
-  const user = api
-    .post(`${import.meta.env.VITE_DOMAIN}/auth/signup`, {
+  const response = await api.post(
+    `${import.meta.env.VITE_DOMAIN}/auth/signup`,
+    {
       fullname,
       email,
       phone,
       password,
-    })
-    .then((response) => response.data);
+    }
+  );
+  const { resFullname, resEmail, resPhone, role, access_token } = response.data;
+
+  const user: User = {
+    fullname,
+    email,
+    phone,
+    role,
+    accessToken: access_token,
+  };
 
   return user;
 }
 
-export function signin({ phone, password }: Auth) {
+export async function signin({ phone, password }: Auth): Promise<User> {
   // Simulate a signin request
 
-  const accessToken = api
-    .post(`${import.meta.env.VITE_DOMAIN}/auth/signin`, {
+  const response = await api.post(
+    `${import.meta.env.VITE_DOMAIN}/auth/signin`,
+    {
       phone,
       password,
-    })
-    .then((response) => response.data);
+    }
+  );
 
-  return accessToken;
+  const { fullname, email, resPhone, role, access_token } = response.data;
+  const user: User = {
+    fullname,
+    email,
+    phone: resPhone,
+    role,
+    accessToken: access_token,
+  };
+
+  return user;
 }
 
 export async function fetchUser(): Promise<User> {

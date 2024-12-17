@@ -12,9 +12,12 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { ScaleLoader } from "react-spinners";
 
 interface User {
-  phone: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
   role?: string; // Roles: "admin", "user", "manager"
   accessToken?: string; // Token for authentication
 }
@@ -25,7 +28,7 @@ interface AuthContextType {
     email: string,
     phone: string,
     password: string
-  ): unknown;
+  ): Promise<User | null>; // Register function
   user: User | null; // Current user
   signin: (username: string, password: string) => Promise<User | null>; // Login function
   signout: () => void; // Logout function
@@ -72,8 +75,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await ApiSignin({ phone, password });
       // Assuming the response contains accessToken, phone, and role
-      const { access_token, role } = response;
-      const user = { phone, role, accessToken: access_token };
+      const { accessToken, role } = response;
+      const user = { phone, role, accessToken };
 
       // Update user state with retrieved details
       setUser(user);
@@ -99,8 +102,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [user, isAuthenticated]);
 
   useEffect(() => {
-    let isMounted = true;
-
     const fetchUser = async () => {
       try {
         // Make a backend API call to validate the session and fetch user details
@@ -115,14 +116,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     fetchUser(); // Try to authenticate on app load
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading indicator while authenticating
+    return <ScaleLoader />; // Show a loading indicator while authenticating
   }
 
   // useLayoutEffect(() => {

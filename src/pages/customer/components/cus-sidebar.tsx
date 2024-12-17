@@ -1,5 +1,5 @@
 import {
-  HandCoins,
+  ArrowRightLeft,
   HistoryIcon,
   LayoutDashboard,
   ReceiptText,
@@ -11,6 +11,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -27,7 +28,7 @@ const items = [
   {
     title: "Transfer",
     url: "/transfer",
-    icon: HandCoins,
+    icon: ArrowRightLeft,
   },
   {
     title: "Transactions History",
@@ -59,7 +60,7 @@ export function CustomerSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild size={"lg"}>
-                    <a href={item.url} className="pl-10">
+                    <a href={`${"/user" + item.url}`} className="pl-10">
                       <item.icon size={20} />
                       <span>{item.title}</span>
                     </a>

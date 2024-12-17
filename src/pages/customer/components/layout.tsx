@@ -7,7 +7,7 @@ export default function Layout() {
     <SidebarProvider>
       <CustomerSidebar />
 
-      <main>
+      <main className="p-3 w-screen">
         <SidebarTrigger />
         <Outlet />
       </main>

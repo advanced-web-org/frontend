@@ -6,7 +6,8 @@ import RegisterPage from "./pages/auth/register";
 import UnauthorizePage from "./pages/auth/unauthorize";
 import UnImplementPage from "./pages/common/unImplement";
 import Layout from "./pages/customer/components/layout";
-import { CustomerHomepage } from "./pages/customer/homepage";
+import HistoryPage from "./pages/customer/pages/history";
+import { DashboardPage } from "./pages/customer/pages/homepage";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 
 function App() {
@@ -37,7 +38,11 @@ function App() {
 
       <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
         <Route path="/user" element={<Layout />}>
-          <Route path="home" element={<CustomerHomepage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="transfer" element={<h1>Transfer</h1>} />
+          <Route path="history" element={<HistoryPage />} />
+          <Route path="debt" element={<h1>Debt</h1>} />
+          <Route path="settings" element={<h1>Settings</h1>} />
         </Route>
       </Route>
       <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>

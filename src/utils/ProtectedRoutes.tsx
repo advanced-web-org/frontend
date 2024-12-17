@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../contexts/authContexts";
 import { useEffect, useState } from "react";
+import { ScaleLoader } from "react-spinners";
 
 interface ProtectedRoutesProps {
   allowedRoles: "user" | "employee" | "admin";
@@ -15,8 +16,7 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ allowedRoles }) => {
   }, [user]);
 
   if (loading) {
-    console.log("loading");
-    return <div>Loading...</div>;
+    return <ScaleLoader />;
   }
 
   if (!user) {
