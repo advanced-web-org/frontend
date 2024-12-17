@@ -27,7 +27,7 @@ export function LoginForm() {
     try {
       const user = await auth.signin(phone, password); // Call the signin function from the AuthContext
       if (user) {
-        navigate(`/${user.role}/home`); // Redirect to the user's home page based on their role
+        navigate(`/${user.role}/dashboard`); // Redirect to the user's home page based on their role
       }
     } catch (err) {
       setError("Invalid phone number or password. Please try again."); // Display error message
@@ -50,7 +50,7 @@ export function LoginForm() {
               <Input
                 id="phone"
                 type="text"
-                placeholder="0333465433"
+                placeholder="Your phone number"
                 onChange={(e) => setPhone(e.target.value)}
                 required
               />
@@ -68,7 +68,7 @@ export function LoginForm() {
               <Input
                 id="password"
                 type="password"
-                placeholder="********"
+                placeholder="Your password"
                 onChange={(e) => setPassword(e.target.value)} // Update password state
                 required
               />

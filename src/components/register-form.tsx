@@ -31,7 +31,7 @@ export function RegisterForm() {
     try {
       const user = await auth.signup(fullName, email, phone, password); // Call the signup function from the auth context
       if (user) {
-        navigate(`/user/home`); // Redirect to the user's home page based on their role
+        navigate(`/user/dashboard`); // Redirect to the user's home page based on their role
       }
     } catch (err) {
       setError("Invalid phone or password. Please try again."); // Display error message

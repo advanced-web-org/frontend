@@ -7,8 +7,9 @@ import UnauthorizePage from "./pages/auth/unauthorize";
 import UnImplementPage from "./pages/common/unImplement";
 import Layout from "./pages/customer/components/layout";
 import HistoryPage from "./pages/customer/pages/history";
-import { DashboardPage } from "./pages/customer/pages/homepage";
+import { DashboardPage } from "./pages/customer/pages/dashboard";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
+import TransferPage from "./pages/customer/pages/transfer";
 
 function App() {
   const authContext = useAuth();
@@ -26,7 +27,7 @@ function App() {
         element={
           isAuthenticated ? (
             <>
-              {user?.role === "user" && <Navigate to="/user/home" />}
+              {user?.role === "user" && <Navigate to="/user/dasboard" />}
               {user?.role === "employee" && <Navigate to="/employee/home" />}
               {user?.role === "admin" && <Navigate to="/admin/home" />}
             </>
@@ -39,7 +40,7 @@ function App() {
       <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
         <Route path="/user" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="transfer" element={<h1>Transfer</h1>} />
+          <Route path="transfer" element={<TransferPage />}></Route>
           <Route path="history" element={<HistoryPage />} />
           <Route path="debt" element={<h1>Debt</h1>} />
           <Route path="settings" element={<h1>Settings</h1>} />
