@@ -6,10 +6,11 @@ import RegisterPage from "./pages/auth/register";
 import UnauthorizePage from "./pages/auth/unauthorize";
 import UnImplementPage from "./pages/common/unImplement";
 import Layout from "./pages/customer/components/layout";
-import HistoryPage from "./pages/customer/pages/history";
+import BeneficiaryPage from "./pages/customer/pages/Beneficienary/beneficiary";
 import { DashboardPage } from "./pages/customer/pages/dashboard";
-import ProtectedRoutes from "./utils/ProtectedRoutes";
+import HistoryPage from "./pages/customer/pages/history";
 import TransferPage from "./pages/customer/pages/transfer";
+import ProtectedRoutes from "./utils/ProtectedRoutes";
 
 function App() {
   const authContext = useAuth();
@@ -40,9 +41,10 @@ function App() {
       <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
         <Route path="/user" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="transfer" element={<TransferPage />}></Route>
-          <Route path="history" element={<HistoryPage />} />
+          <Route path="transfer" element={<TransferPage />} />
           <Route path="debt" element={<h1>Debt</h1>} />
+          <Route path="beneficiary" element={<BeneficiaryPage />} />
+          <Route path="history" element={<HistoryPage />} />
           <Route path="settings" element={<h1>Settings</h1>} />
         </Route>
       </Route>

@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   ReceiptText,
   Settings,
+  Users,
 } from "lucide-react";
 
 import {
@@ -32,14 +33,19 @@ const items = [
     icon: ArrowRightLeft,
   },
   {
-    title: "Transactions History",
-    url: "/history",
-    icon: HistoryIcon,
-  },
-  {
     title: "Debt",
     url: "/debt",
     icon: ReceiptText,
+  },
+  {
+    title: "Beneficiary",
+    url: "/beneficiary",
+    icon: Users,
+  },
+  {
+    title: "Transactions History",
+    url: "/history",
+    icon: HistoryIcon,
   },
   {
     title: "Settings",
