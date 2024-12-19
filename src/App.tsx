@@ -1,21 +1,36 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { useAuth } from "./contexts/authContexts";
 import LoginPage from "./pages/auth/login";
 import RegisterPage from "./pages/auth/register";
-import UnauthorizePage from "./pages/auth/unauthorize";
+import UnauthorizePage from "./pages/common/unauthorize";
 import UnImplementPage from "./pages/common/unImplement";
 import Layout from "./pages/customer/components/layout";
 import BeneficiaryPage from "./pages/customer/pages/Beneficienary/beneficiary";
 import { DashboardPage } from "./pages/customer/pages/dashboard";
 import HistoryPage from "./pages/customer/pages/history";
-import TransferPage from "./pages/customer/pages/transfer";
+import TransferPage from "./pages/customer/pages/Transfer/transfer";
+import { useAuthStore } from "./stores/authStore";
+import { useUserStore } from "./stores/userStore";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
+import { useEffect } from "react";
+import { fetchUser } from "./api/auth/auth";
 
 function App() {
-  const authContext = useAuth();
-  const { user } = authContext;
-  const { isAuthenticated } = authContext;
+  const userStore = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
+  const { accessToken } = useAuthStore((state) => state);
+
+  useEffect(() => {
+    fetchUser()
+      .then((user) => {
+        if (user) {
+          setUser(user);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch user:", error);
+      });
+  }, [accessToken, setUser]);
 
   return (
     <Routes>
@@ -26,11 +41,13 @@ function App() {
       <Route
         path="/"
         element={
-          isAuthenticated ? (
+          accessToken ? (
             <>
-              {user?.role === "user" && <Navigate to="/user/dasboard" />}
-              {user?.role === "employee" && <Navigate to="/employee/home" />}
-              {user?.role === "admin" && <Navigate to="/admin/home" />}
+              {userStore?.role === "user" && <Navigate to="user/dashboard" />}
+              {userStore?.role === "employee" && (
+                <Navigate to="/employee/home" />
+              )}
+              {userStore?.role === "admin" && <Navigate to="/admin/home" />}
             </>
           ) : (
             <Navigate to="/auth/login" />

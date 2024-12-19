@@ -1,6 +1,6 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../contexts/authContexts";
+import { useUserStore } from "@/stores/userStore";
 import { useEffect, useState } from "react";
+import { Navigate, Outlet } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 
 interface ProtectedRoutesProps {
@@ -8,11 +8,15 @@ interface ProtectedRoutesProps {
 }
 
 const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ allowedRoles }) => {
-  const { user } = useAuth(); // Get the user and role from your AuthContext
+  const user = useUserStore.getState().user;
   const [loading, setLoading] = useState(true);
 
+  console.log("user", user);
+
   useEffect(() => {
-    setLoading(user === null);
+    if (user !== null) {
+      setLoading(false);
+    }
   }, [user]);
 
   if (loading) {

@@ -1,37 +1,43 @@
 import api from "../api";
+import { User } from "../../stores/userStore";
 
 interface Auth {
   phone: string;
   password: string;
 }
 
-interface User {
-  fullname: string;
+export interface CreateUserDto {
+  fullName: string;
   email: string;
   phone: string;
-  password?: string;
-  role?: string;
-  accessToken?: string;
+  password: string;
 }
 
-export async function signup({ fullname, email, phone, password }: User) {
+export async function signup(userData: CreateUserDto): Promise<User> {
   // Simulate a signup request
 
   const response = await api.post(
     `${import.meta.env.VITE_DOMAIN}/auth/signup`,
     {
-      fullname,
-      email,
-      phone,
-      password,
+      ...userData,
     }
   );
-  const { resFullname, resEmail, resPhone, role, access_token } = response.data;
+  const {
+    resFullname,
+    resEmail,
+    resPhone,
+    role,
+    account_number,
+    account_balance,
+    access_token,
+  } = response.data;
 
   const user: User = {
-    fullname,
-    email,
-    phone,
+    fullname: resFullname,
+    email: resEmail,
+    phone: resPhone,
+    account_number,
+    account_balance,
     role,
     accessToken: access_token,
   };
@@ -40,9 +46,7 @@ export async function signup({ fullname, email, phone, password }: User) {
 }
 
 export async function signin({ phone, password }: Auth): Promise<User> {
-  // Simulate a signin request
-
-  const response = await api.post(
+  const { data } = await api.post(
     `${import.meta.env.VITE_DOMAIN}/auth/signin`,
     {
       phone,
@@ -50,31 +54,23 @@ export async function signin({ phone, password }: Auth): Promise<User> {
     }
   );
 
-  const { fullname, email, resPhone, role, access_token } = response.data;
-  const user: User = {
-    fullname,
-    email,
-    phone: resPhone,
-    role,
-    accessToken: access_token,
+  // Map the response data directly into the `User` object
+  return {
+    fullname: data.fullname,
+    email: data.email,
+    phone: data.phone,
+    role: data.role,
+    account_number: data.account_number,
+    account_balance: data.account_balance,
+    accessToken: data.access_token,
   };
-
-  return user;
 }
 
 export async function fetchUser(): Promise<User> {
   try {
     const response = await api.get(`${import.meta.env.VITE_DOMAIN}/auth/me`);
-    const { fullname, email, phone, role, access_token } = response.data;
+    const user = response.data;
 
-    const user: User = {
-      fullname,
-      email,
-      phone,
-      role,
-      accessToken: access_token,
-    };
-    console.log("fetchUser", user);
     return user;
   } catch (error) {
     console.error("Failed to fetch user:", error);

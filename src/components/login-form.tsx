@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/authContexts";
 import { useState } from "react";
+import { useAuthStore } from "@/stores/authStore";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -19,13 +20,13 @@ export function LoginForm() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const auth = useAuth();
+  const auth = useAuthStore((state) => state);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent form default submission behavior
 
     try {
-      const user = await auth.signin(phone, password); // Call the signin function from the AuthContext
+      const user = await auth.signin({ phone, password }); // Call the signin function from the AuthContext
       if (user) {
         navigate(`/${user.role}/dashboard`); // Redirect to the user's home page based on their role
       }
