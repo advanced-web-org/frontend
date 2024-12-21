@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ColumnFiltersState } from "@tanstack/react-table";
 import { DateRangePickerComponent } from "../components/tables/date-filter";
 import { DateRange } from "react-day-picker";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 const uData = [
   4000, 3000, 2000, 2780, 1890, 2390, 3490, 4200, 3100, 2900, 3300, 4100,
@@ -47,6 +48,11 @@ const data: Transaction[] = [
 
 const totalRevenue = pData.map((value, index) => value + uData[index]);
 
+const banksList = [
+  { value: "vietcombank", label: "Vietcombank" },
+  { value: "agribank", label: "Agribank" }
+];
+
 export default function SimpleLineChart() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
@@ -67,6 +73,8 @@ export default function SimpleLineChart() {
     ]);
   };
 
+  const [selectedBanks, setSelectedBanks] = useState<string[]>(["vietcombank", "agribank"]);
+
   return (
     <>
       <CustomLineChart
@@ -78,11 +86,25 @@ export default function SimpleLineChart() {
         xLabels={xLabels}
       />
 
-      <div className="mb-4 mx-6">
+      <div className="mb-4 mx-6" style={{ width: "50%", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "3rem" }}>
         <DateRangePickerComponent onChange={handleDateRangeChange} />
+        <MultiSelect
+          options={banksList}
+          onValueChange={setSelectedBanks}
+          defaultValue={selectedBanks}
+          placeholder="Select banks"
+          variant="inverted"
+          animation={2}
+          maxCount={3}
+        />
       </div>
 
-      <DataTable columns={TransactionTableColumns} data={data} columnFilters={columnFilters} />
+
+      <DataTable
+        columns={TransactionTableColumns}
+        data={data}
+        columnFilters={columnFilters}
+      />
     </>
   );
 }

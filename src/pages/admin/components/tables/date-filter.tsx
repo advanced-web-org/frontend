@@ -1,34 +1,3 @@
-// import React from 'react';
-// import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-// import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
-// import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
-// import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-
-// interface DateRangePickerComponentProps {
-//   startLabel?: string;
-//   endLabel?: string;
-//   onChange: (dateRange: [Date | null, Date | null]) => void;
-// }
-
-// const DateRangePickerComponent: React.FC<DateRangePickerComponentProps> = ({
-//   startLabel = 'Start Date',
-//   endLabel = 'End Date',
-//   onChange,
-// }) => {
-//   return (
-//     <LocalizationProvider dateAdapter={AdapterDayjs}>
-//       <DemoContainer components={['DateRangePicker']}>
-//         <DateRangePicker
-//           localeText={{ start: startLabel, end: endLabel }}
-//           onChange={(value) => onChange([value[0]?.toDate() || null, value[1]?.toDate() || null])}
-//         />
-//       </DemoContainer>
-//     </LocalizationProvider>
-//   );
-// };
-
-// export default DateRangePickerComponent;
-
 import * as React from "react"
 import { addDays, format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
