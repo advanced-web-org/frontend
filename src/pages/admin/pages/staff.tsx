@@ -1,5 +1,5 @@
 import { DataTable } from "../components/tables/table";
-import { columns } from "../components/tables/columns";
+import { StaffTableColumns } from "../components/tables/columns";
 
 export default function StaffPage() {
   const data = [
@@ -20,7 +20,7 @@ export default function StaffPage() {
   return (
     <>
       <p className="text-2xl pt-1 pb-3 font-semibold">Staffs</p>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={StaffTableColumns} data={data} />
     </>
   );
 }

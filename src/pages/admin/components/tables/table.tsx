@@ -1,8 +1,10 @@
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  useReactTable,
+  getFilteredRowModel,
+  useReactTable
 } from "@tanstack/react-table";
 
 import {
@@ -13,24 +15,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+// import { useState } from "react";
+// import { DateRange } from "react-day-picker";
+// import { DateRangePickerComponent } from "./date-filter";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  columnFilters?: ColumnFiltersState;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  columnFilters,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
+    state: {
+      columnFilters
+    },
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    // onColumnFiltersChange: setColumnFilters
   });
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border mx-6">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
