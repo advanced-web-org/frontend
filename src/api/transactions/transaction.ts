@@ -25,3 +25,11 @@ export async function getTransactions(): Promise<Transaction[]> {
   ];
   return transactions;
 }
+
+export async function getExternalBalance(externalBankId?: number): Promise<object[]> {
+  const response = await api
+    .get(`${import.meta.env.VITE_DOMAIN}/transactions/external/balance/` + (externalBankId ? externalBankId.toString() : ""))
+    .then((res) => res.data);
+  console.log(response);
+  return response;
+}
