@@ -4,8 +4,19 @@ import {
   getTransactions,
   Transaction,
 } from "@/api/transactions/transaction";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { ColumnFiltersState } from "@tanstack/react-table";
 import { DollarSign, Frown, Smile } from "lucide-react";
@@ -18,39 +29,6 @@ import { DataTable } from "../components/tables/table";
 import React from "react";
 import { Label, Pie, PieChart } from "recharts";
 
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
-]
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig
-
 export default function SimpleLineChart() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
@@ -62,6 +40,17 @@ export default function SimpleLineChart() {
   const [banks, setBanks] = useState<{ value: string; label: string }[]>([]);
   const [selectedBanks, setSelectedBanks] = useState<string[]>([]);
   const [data, setData] = useState<Transaction[]>([]);
+  const [chartData, setChartData] = useState<
+    { bank: string; amount: number }[]
+  >([]);
+  const [chartConfig, setChartConfig] = useState<ChartConfig>({
+    amount: {
+      label: "Transaction Amount",
+    },
+  });
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [highestAmount, setHighestAmount] = useState<number>(0);
+  const [lowestAmount, setLowestAmount] = useState<number>(0);
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
     setDateRange(range);
@@ -76,11 +65,9 @@ export default function SimpleLineChart() {
 
   useEffect(() => {
     getTransactions().then((transactions) => {
-      console.log(transactions);
       setData(transactions);
     });
 
-    // fetch all banks
     getBanks().then((banks) => {
       setSelectedBanks(banks.map((bank) => bank.bank_name));
       setBanks(
@@ -88,12 +75,33 @@ export default function SimpleLineChart() {
       );
     });
 
-    getExternalBalance();
-  }, []);
+    getExternalBalance().then((response) => {
+      const chartData = response.map(
+        (data: any) => ({
+          bank: data.bankName,
+          amount: data.totalBalance,
+        })
+      );
+      setChartData(chartData);
 
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-  }, [])
+      chartData.forEach((data, index) => {
+        chartConfig[data.bank] = {
+          label: data.bank,
+          color: `hsl(var(--chart-${index + 1}))`,
+        };
+      });
+
+      setChartConfig(chartConfig);
+
+      setTotalAmount(chartData.reduce((acc, data) => acc + data.amount, 0));
+      setHighestAmount(
+        Math.max(...chartData.map((data) => data.amount), 0)
+      );
+      setLowestAmount(
+        Math.min(...chartData.map((data) => data.amount), Infinity)
+      );
+    });
+  }, []);
 
   return (
     <>
@@ -104,10 +112,10 @@ export default function SimpleLineChart() {
               <CardTitle className="text-sm font-medium">
                 Total Amount
               </CardTitle>
-              <DollarSign/>
+              <DollarSign />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$45,231.89</div>
+              <div className="text-2xl font-bold">${totalAmount}</div>
               <p className="text-xs text-muted-foreground">
                 +20.1% from last month
               </p>
@@ -118,10 +126,10 @@ export default function SimpleLineChart() {
               <CardTitle className="text-sm font-medium">
                 Top Transaction Amount
               </CardTitle>
-              <Smile/>
+              <Smile />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$5,231</div>
+              <div className="text-2xl font-bold">${highestAmount}</div>
               <p className="text-xs text-muted-foreground">
                 +180.1% from last month
               </p>
@@ -129,11 +137,13 @@ export default function SimpleLineChart() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Lowest Transaction Amount</CardTitle>
-              <Frown/>
+              <CardTitle className="text-sm font-medium">
+                Lowest Transaction Amount
+              </CardTitle>
+              <Frown />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$231</div>
+              <div className="text-2xl font-bold">${lowestAmount}</div>
               <p className="text-xs text-muted-foreground">
                 +19% from last month
               </p>
@@ -157,8 +167,8 @@ export default function SimpleLineChart() {
                 />
                 <Pie
                   data={chartData}
-                  dataKey="visitors"
-                  nameKey="browser"
+                  dataKey="amount"
+                  nameKey="bank"
                   innerRadius={60}
                   strokeWidth={5}
                 >
@@ -177,14 +187,7 @@ export default function SimpleLineChart() {
                               y={viewBox.cy}
                               className="fill-foreground text-3xl font-bold"
                             >
-                              {totalVisitors.toLocaleString()}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
-                              className="fill-muted-foreground"
-                            >
-                              Visitors
+                              ${totalAmount.toLocaleString()}
                             </tspan>
                           </text>
                         );

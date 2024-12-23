@@ -53,7 +53,6 @@ export const TransactionTableColumns: ColumnDef<Transaction>[] = [
       return format(date, "PPP p");
     },
     filterFn: (row, columnId, filterValue: DateRange | undefined) => {
-      console.log("INSIDE FILTER FN", filterValue);
       if (!filterValue || (!filterValue.from && !filterValue.to)) {
         return true;
       }
