@@ -9,7 +9,9 @@ export default function AdminLayout() {
 
       <main className="p-3 w-screen">
         <SidebarTrigger />
-        <Outlet />
+        <div className="mx-12 my-8">
+          <Outlet />
+        </div>
       </main>
     </SidebarProvider>
   );
