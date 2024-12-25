@@ -1,8 +1,17 @@
 import { Staff } from "@/api/staffs/staff";
 import { Transaction } from "@/api/transactions/transaction";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+
+const bankFilterFn: FilterFn<Transaction> = (row, _, filterValue: string[]) => {
+  const toBank = row.getValue("to_bank_name");
+  const fromBank = row.getValue("from_bank_name");
+
+  return filterValue.some(
+    (bank: string) => toBank === bank || fromBank === bank
+  );
+};
 
 export const StaffTableColumns: ColumnDef<Staff>[] = [
   {
@@ -37,6 +46,26 @@ export const TransactionTableColumns: ColumnDef<Transaction>[] = [
     },
   },
   {
+    accessorKey: "from_account_number",
+    header: "Sender",
+    filterFn: "includesString",
+  },
+  {
+    id: "from_bank_name",
+    accessorKey: "from_bank_name",
+    header: "From",
+  },
+  {
+    accessorKey: "to_account_number",
+    header: "Receiver",
+    filterFn: "includesString",
+  },
+  {
+    id: "to_bank_name",
+    accessorKey: "to_bank_name",
+    header: "To",
+  },
+  {
     accessorKey: "transaction_amount",
     header: "Amount",
   },
@@ -63,4 +92,8 @@ export const TransactionTableColumns: ColumnDef<Transaction>[] = [
       return (!from || rowDate >= from) && (!to || rowDate <= to);
     },
   },
+  {
+    id: "bank_filter",
+    filterFn: bankFilterFn,
+  }
 ];

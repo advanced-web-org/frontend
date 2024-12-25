@@ -49,7 +49,7 @@ export function AdminSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const isActive = location.pathname === `/admin${item.url}`; // Check active route.
+                const isActive = location.pathname === `/admin${item.url}`;
 
                 return (
                   <SidebarMenuItem key={item.title}>

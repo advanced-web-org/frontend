@@ -23,12 +23,12 @@ const CustomLineChart: React.FC<LineChartProps> = ({
 
   useEffect(() => {
     const handleResize = () => {
-      const width = window.innerWidth * 0.8; // 80% of window width
-      const height = window.innerHeight * 0.5; // 50% of window height
+      const width = window.innerWidth * 0.8;
+      const height = window.innerHeight * 0.5;
       setChartSize({ width, height });
     };
 
-    handleResize(); // Initial size setup
+    handleResize();
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);

@@ -1,9 +1,8 @@
-import * as React from "react"
-import { addDays, format } from "date-fns"
+import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
+import * as React from "react"
 import { DateRange } from "react-day-picker"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -11,18 +10,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 export function DateRangePickerComponent({
   className,
+  initialDateRange,
   onChange,
 }: {
   className?: string;
+  initialDateRange: DateRange | undefined;
   onChange: (dateRange: DateRange | undefined) => void;
 }) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2022, 0, 20),
-    to: addDays(new Date(2022, 0, 20), 20),
-  });
+  const [date, setDate] = React.useState<DateRange | undefined>(initialDateRange);
 
   const handleDateSelect = (range: DateRange | undefined) => {
     setDate(range);

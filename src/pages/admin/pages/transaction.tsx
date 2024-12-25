@@ -1,7 +1,7 @@
 import { getBanks } from "@/api/banks/bank";
 import {
   getExternalBalance,
-  getTransactions,
+  getExternalTransactions,
   Transaction,
 } from "@/api/transactions/transaction";
 import {
@@ -26,11 +26,13 @@ import { TransactionTableColumns } from "../components/tables/columns";
 import { DateRangePickerComponent } from "../components/tables/date-filter";
 import { DataTable } from "../components/tables/table";
 
-import React from "react";
 import { Label, Pie, PieChart } from "recharts";
 
 export default function SimpleLineChart() {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(2020, 0, 20),
+    to: new Date(),
+  });
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([
     {
       id: "transaction_date",
@@ -54,34 +56,56 @@ export default function SimpleLineChart() {
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
     setDateRange(range);
-    setColumnFilters((prev) => [
-      ...prev,
-      {
-        id: "transaction_date",
-        value: range,
-      },
-    ]);
+    setColumnFilters((prev) => {
+      const updatedFilters = prev.filter(
+        (filter) => filter.id !== "transaction_date"
+      );
+      if (range) {
+        updatedFilters.push({
+          id: "transaction_date",
+          value: range,
+        });
+      }
+      return updatedFilters;
+    });
+  };
+
+  const handleBankFilterChange = (selectedBanks: string[]) => {
+    setColumnFilters((prev) => {
+      const updatedFilters = prev.filter(
+        (filter) => filter.id !== "bank_filter"
+      );
+      if (selectedBanks.length > 0) {
+        updatedFilters.push({
+          id: "bank_filter",
+          value: selectedBanks,
+        });
+      }
+      return updatedFilters;
+    });
   };
 
   useEffect(() => {
-    getTransactions().then((transactions) => {
+    getExternalTransactions().then((transactions) => {
       setData(transactions);
     });
 
     getBanks().then((banks) => {
-      setSelectedBanks(banks.map((bank) => bank.bank_name));
+      const bankNames = banks.map((bank) => bank.bank_name);
+      setSelectedBanks(bankNames);
       setBanks(
-        banks.map((bank) => ({ value: bank.bank_name, label: bank.bank_name }))
+        banks
+          .map((bank) => ({ value: bank.bank_name, label: bank.bank_name }))
+          // add one more bank for testing
+          .concat({ value: "Test Bank", label: "Test Bank" })
       );
     });
 
     getExternalBalance().then((response) => {
-      const chartData = response.map(
-        (data: any) => ({
-          bank: data.bankName,
-          amount: data.totalBalance,
-        })
-      );
+      const chartData = response.map((data: any) => ({
+        bank: data.bankName,
+        amount: data.totalBalance,
+      }));
       setChartData(chartData);
 
       chartData.forEach((data, index) => {
@@ -94,9 +118,7 @@ export default function SimpleLineChart() {
       setChartConfig(chartConfig);
 
       setTotalAmount(chartData.reduce((acc, data) => acc + data.amount, 0));
-      setHighestAmount(
-        Math.max(...chartData.map((data) => data.amount), 0)
-      );
+      setHighestAmount(Math.max(...chartData.map((data) => data.amount), 0));
       setLowestAmount(
         Math.min(...chartData.map((data) => data.amount), Infinity)
       );
@@ -216,10 +238,16 @@ export default function SimpleLineChart() {
           gap: "3rem",
         }}
       >
-        <DateRangePickerComponent onChange={handleDateRangeChange} />
+        <DateRangePickerComponent
+          onChange={handleDateRangeChange}
+          initialDateRange={dateRange}
+        />
         <MultiSelect
           options={banks}
-          onValueChange={setSelectedBanks}
+          onValueChange={(values) => {
+            handleBankFilterChange(values);
+            setSelectedBanks(values);
+          }}
           defaultValue={selectedBanks}
           placeholder="Select banks"
           variant="inverted"
