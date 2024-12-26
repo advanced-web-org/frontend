@@ -14,6 +14,7 @@ import { useUserStore } from "./stores/userStore";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import { useEffect } from "react";
 import { fetchUser } from "./api/auth/auth";
+import EmpDashboardPage from "./pages/employee/dashboard";
 
 function App() {
   const userStore = useUserStore((state) => state.user);
@@ -66,7 +67,7 @@ function App() {
         </Route>
       </Route>
       <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
-        <Route path="/employee/home" element={<h1>Emp home</h1>} />
+        <Route path="/employee/dashboard" element={<EmpDashboardPage />} />
       </Route>
       <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
         <Route path="/admin/home" element={<h1>Admin home</h1>} />
