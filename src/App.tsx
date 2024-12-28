@@ -92,7 +92,7 @@ function App() {
         <Route path="/employee/dashboard" element={<EmpDashboardPage />} />
       </Route>
       <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
-        <Route path="/admin/home" element={<h1>Admin home</h1>} />
+        <Route path="/admin/dashboard" element={<h1>Admin home</h1>} />
       </Route>
 
       <Route path="*" element={<UnImplementPage />} />

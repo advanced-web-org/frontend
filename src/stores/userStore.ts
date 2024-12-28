@@ -1,15 +1,16 @@
 import { create } from "zustand";
 
 export interface User {
-  id: number;
+  userId?: number;
   fullname: string;
-  email: string;
-  phone: string;
+  email?: string;
+  username?: string;
+  phone?: string;
   role: string;
   bank_id: number;
-  accessToken: string;
-  account_number: string;
-  account_balance: number;
+  accessToken?: string;
+  account_number?: string;
+  account_balance?: number;
 }
 
 type UserStore = {
