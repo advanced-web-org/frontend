@@ -4,6 +4,8 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
+  TableOptions,
   useReactTable
 } from "@tanstack/react-table";
 
@@ -20,23 +22,30 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   columnFilters?: ColumnFiltersState;
+  selectedRow?: object;
+  setSelectedRow?: (row: object) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   columnFilters,
+  selectedRow,
+  setSelectedRow
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     state: {
-      columnFilters
+      columnFilters,
+      selectedRow
     },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    // onColumnFiltersChange: setColumnFilters
-  });
+    enableRowSelection: true,
+    onRowSelectionChange: setSelectedRow,
+    getSortedRowModel: getSortedRowModel(),
+  } as TableOptions<TData>);
 
   return (
     <div className="rounded-md border">

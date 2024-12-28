@@ -1,8 +1,22 @@
 import { Staff } from "@/api/staffs/staff";
 import { Transaction } from "@/api/transactions/transaction";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
-import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
+import { MoreHorizontal } from "lucide-react";
+import { DateRange } from "react-day-picker";
+
+interface ActionsColumnProps {
+  handleEdit: (staffId: number) => void;
+  handleRemove: (staffId: number) => void;
+}
 
 const bankFilterFn: FilterFn<Transaction> = (row, _, filterValue: string[]) => {
   const toBank = row.getValue("to_bank_name");
@@ -13,7 +27,10 @@ const bankFilterFn: FilterFn<Transaction> = (row, _, filterValue: string[]) => {
   );
 };
 
-export const StaffTableColumns: ColumnDef<Staff>[] = [
+export const createStaffTableColumns = ({
+  handleEdit,
+  handleRemove,
+}: ActionsColumnProps): ColumnDef<Staff>[] => [
   {
     accessorKey: "staff_id",
     header: "ID",
@@ -33,6 +50,45 @@ export const StaffTableColumns: ColumnDef<Staff>[] = [
     accessorKey: "username",
     header: "Username",
     filterFn: "includesString",
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const staff = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => handleEdit(staff.staff_id)}>
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRemove(staff.staff_id)}>
+              Remove
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+  {
+    id: "staff_search",
+    filterFn: (row, _, filterValue: string) => {
+      return Object.values(row.original).some((value) => {
+        return (
+          value !== null &&
+          value.toString().toLowerCase().includes(filterValue.toLowerCase())
+        );
+      });
+    },
   },
 ];
 
@@ -95,5 +151,5 @@ export const TransactionTableColumns: ColumnDef<Transaction>[] = [
   {
     id: "bank_filter",
     filterFn: bankFilterFn,
-  }
+  },
 ];

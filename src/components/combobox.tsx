@@ -20,18 +20,20 @@ import {
 } from "@/components/ui/popover";
 
 interface ComboboxProps {
-  choices: { value: any; label: string }[];
-  value: number | undefined;
-  onSelect: (value: number) => void;
+  choices: { value: string; label: string }[];
+  label: string;
+  value: string | undefined;
+  onSelect: (value: string) => void;
 }
 
 export function Combobox({
   choices,
   value,
+  label,
   onSelect,
 }: Readonly<ComboboxProps>) {
   const [open, setOpen] = React.useState(false);
-
+  
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -44,12 +46,12 @@ export function Combobox({
         >
           {value
             ? choices.find((choice) => choice.value === value)?.label
-            : "Select bank..."}
+            : label}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="p-0 w-120">
+      <PopoverContent className="p-0 w-100">
         <Command>
           <CommandInput placeholder="Search bank..." />
           <CommandList>
