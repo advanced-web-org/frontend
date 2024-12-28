@@ -14,6 +14,8 @@ import { useUserStore } from "./stores/userStore";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import { useEffect } from "react";
 import { fetchUser } from "./api/auth/auth";
+import CreateDebt from "./pages/debts/create-debt";
+import ViewDebts from "./pages/debts/view-debts";
 
 function App() {
   const userStore = useUserStore((state) => state.user);
@@ -37,6 +39,8 @@ function App() {
       <Route path="/auth/login" element={<LoginPage />} />
       <Route path="/auth/register" element={<RegisterPage />} />
       <Route path="/unauthorized" element={<UnauthorizePage />} />
+      <Route path="/debts/create-debt" element={<CreateDebt />} />
+      <Route path="/debts/view-debts" element={<ViewDebts />} />
 
       <Route
         path="/"

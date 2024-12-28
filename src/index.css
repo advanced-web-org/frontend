@@ -141,4 +141,8 @@ button {
   body {
     @apply bg-background text-foreground;
   }
+
+  .bounce-item {
+    @apply transform transition-transform duration-500 hover:-translate-y-1 hover:shadow-lg;
+  }
 }
