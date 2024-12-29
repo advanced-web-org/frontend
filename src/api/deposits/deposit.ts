@@ -13,6 +13,6 @@ export interface Deposit {
   };
 }
 
-export async function deposit(deposit: Deposit): Promise<void> {
+export async function APIdeposit(deposit: Deposit): Promise<void> {
   await api.post(`${import.meta.env.VITE_DOMAIN}/deposits`, deposit);
 }

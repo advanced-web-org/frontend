@@ -1,18 +1,4 @@
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-import * as React from "react";
-import { Customer } from "@/api/customers/customer";
+import { Customer, getCustomerWithAccounts } from "@/api/customers/customer";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -32,6 +18,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import * as React from "react";
 import { DialogDemo } from "./Dialog";
 
 interface EmpTableProps {
@@ -39,6 +39,7 @@ interface EmpTableProps {
 }
 
 export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
+  const [dataState, setDataState] = React.useState<Customer[]>(data);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -172,7 +173,7 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
   ];
 
   const table = useReactTable({
-    data,
+    data: dataState,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -189,13 +190,22 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
       rowSelection,
     },
   });
+
+  async function handleDataUpdate() {
+    const updatedData = await getCustomerWithAccounts();
+    setDataState(updatedData);
+  }
+
   return (
     <div className="w-full">
       {isDialogOpen && (
         <DialogDemo
           isOpen={isDialogOpen}
           account={account_number}
-          onClose={() => setIsDialogOpen(false)}
+          onClose={() => {
+            handleDataUpdate();
+            setIsDialogOpen(false);
+          }}
         />
       )}
 

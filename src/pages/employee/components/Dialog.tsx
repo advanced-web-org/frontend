@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { APIdeposit } from "@/api/deposits/deposit";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUserStore } from "@/stores/userStore";
-import { deposit } from "@/api/deposits/deposit";
+import { useState } from "react";
 
 interface DialogDemoProps {
   isOpen: boolean;
@@ -69,7 +69,7 @@ export function DialogDemo({
       },
     };
 
-    deposit(depositPayload)
+    APIdeposit(depositPayload)
       .then(() => {
         // Reset form and close dialog
         setFormData({ amount: 0, message: "" });
