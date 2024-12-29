@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/',
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 5000, // Optional timeout in milliseconds
 });
 const temp_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIn0.hxg7RmVNesGiy3rf-jR1o6NGVE6B_e4SthSjGrtUCz8"
