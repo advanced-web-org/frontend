@@ -10,9 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/contexts/authContexts";
-import { useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
+import { useState } from "react";
 
 export function LoginForm() {
   const navigate = useNavigate();

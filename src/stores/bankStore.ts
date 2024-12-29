@@ -12,6 +12,7 @@ export const useBankStore = create<BankStore>((set) => ({
   setBanks: async () => {
     try {
       const banks = await getBanks(); // Fetch banks from the API
+      console.log(banks);
       set({ banks }); // Update the state with fetched banks
     } catch (error) {
       console.error("Failed to fetch banks:", error);

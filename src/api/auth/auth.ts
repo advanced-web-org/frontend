@@ -23,6 +23,7 @@ export async function signup(userData: CreateUserDto): Promise<User> {
     }
   );
   const {
+    resId,
     resFullname,
     resEmail,
     resPhone,
@@ -33,6 +34,7 @@ export async function signup(userData: CreateUserDto): Promise<User> {
   } = response.data;
 
   const user: User = {
+    id: resId,
     fullname: resFullname,
     email: resEmail,
     phone: resPhone,
@@ -56,6 +58,7 @@ export async function signin({ phone, password }: Auth): Promise<User> {
 
   // Map the response data directly into the `User` object
   return {
+    id: data.id,
     fullname: data.fullname,
     email: data.email,
     phone: data.phone,

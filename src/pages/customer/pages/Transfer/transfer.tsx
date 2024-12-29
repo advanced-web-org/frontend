@@ -1,12 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
-import InternalTransferForm from "./internal-form";
 import ExternalTransferForm from "./external-form";
-import { useBankStore } from "@/stores/bankStore";
-import { useEffect } from "react";
+import InternalTransferForm from "./internal-form";
 
 export default function TransferPage() {
-
-
   return (
     <div className="px-40">
       <h1 className="text-3xl font-semibold text-center pb-3">Transfer</h1>

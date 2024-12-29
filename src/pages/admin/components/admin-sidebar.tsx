@@ -1,10 +1,7 @@
 import {
-  ArrowRightLeft,
   HistoryIcon,
-  LayoutDashboard,
-  ReceiptText,
   Settings,
-  Users,
+  Users
 } from "lucide-react";
 
 import {
@@ -18,33 +15,18 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { NavLink, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 // Menu items.
 const items = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Transfer",
-    url: "/transfer",
-    icon: ArrowRightLeft,
-  },
-  {
-    title: "Debt",
-    url: "/debt",
-    icon: ReceiptText,
-  },
-  {
-    title: "Beneficiary",
-    url: "/beneficiary",
+    title: "Staffs",
+    url: "/staffs",
     icon: Users,
   },
   {
     title: "Transactions History",
-    url: "/history",
+    url: "/transactions",
     icon: HistoryIcon,
   },
   {
@@ -54,7 +36,7 @@ const items = [
   },
 ];
 
-export function CustomerSidebar() {
+export function AdminSidebar() {
   const location = useLocation();
 
   return (
@@ -67,20 +49,20 @@ export function CustomerSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const isActive = location.pathname === `/user${item.url}`; // Check active route.
+                const isActive = location.pathname === `/admin${item.url}`;
 
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild size={"lg"}>
-                      <NavLink
-                        to={`/user${item.url}`}
+                      <a
+                        href={`/admin${item.url}`}
                         className={`pl-10 flex items-center gap-2 rounded-md ${
                           isActive && "bg-teal-200" // Active styles
                         }`}
                       >
                         <item.icon size={20} />
                         <span>{item.title}</span>
-                      </NavLink>
+                      </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
