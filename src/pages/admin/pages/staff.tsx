@@ -1,4 +1,10 @@
-import { getStaffs, Staff } from "@/api/staffs/staff";
+import {
+  addStaff,
+  deleteStaff,
+  getStaffs,
+  Staff,
+  updateStaff,
+} from "@/api/staffs/staff";
 import { FormDialog } from "@/components/form-dialog";
 import { Button } from "@/components/ui/button";
 import { DialogTrigger } from "@/components/ui/dialog";
@@ -23,7 +29,7 @@ export default function StaffPage() {
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<any>(null);
   const [editFormState, setEditFormState] = useState({
-    name: "",
+    fullName: "",
     username: "",
     role: "",
   });
@@ -51,16 +57,20 @@ export default function StaffPage() {
   };
 
   const handleRemove = (staffId: number) => {
-    console.log("Removing staff with ID:", staffId);
+    const staff = data.find((staff) => staff.staff_id === staffId);
+    if (staff) {
+      handleRowSelection(staff);
+    }
     setIsRemoveDialogOpen(true);
   };
 
   const handleEdit = (staffId: number) => {
     const staff = data.find((staff) => staff.staff_id === staffId);
+    console.log("Editing staff", staff);
     if (staff) {
       handleRowSelection(staff);
       setEditFormState({
-        name: staff.full_name,
+        fullName: staff.full_name,
         username: staff.username,
         role: staff.role,
       });
@@ -71,6 +81,65 @@ export default function StaffPage() {
   const handleRowSelection = (row: object) => {
     const staff = row as Staff;
     setSelectedStaff(staff);
+  };
+
+  const handleAddStaffSubmit = async () => {
+    await addStaff({
+      fullName: name,
+      username,
+      role,
+      password,
+    })
+      .then((staff) => {
+        setData((prev) => [...prev, staff]);
+        setIsCreateDialogOpen(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleUpdateStaffSubmit = async () => {
+    console.log("Updating staff...", {
+      fullName: editFormState.fullName,
+      username: editFormState.username,
+      role: editFormState.role
+    });
+    await updateStaff({
+      fullName: editFormState.fullName,
+      username: editFormState.username,
+      role: editFormState.role,
+    })
+      .then((staff) => {
+        setData((prev) => {
+          const index = prev.findIndex(
+            (staff) => staff.staff_id === selectedStaff.staff_id
+          );
+          prev[index] = staff;
+          return [...prev];
+        });
+        setIsEditDialogOpen(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleRemoveStaffSubmit = async () => {
+    // Remove staff
+    await deleteStaff(selectedStaff.staff_id)
+      .then(() => {
+        setData((prev) => {
+          const updatedData = prev.filter(
+            (staff) => staff.staff_id !== selectedStaff.staff_id
+          );
+          return updatedData;
+        });
+        setIsRemoveDialogOpen(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   useEffect(() => {
@@ -140,9 +209,7 @@ export default function StaffPage() {
             ]}
             isOpen={isCreateDialogOpen}
             setOpen={setIsCreateDialogOpen}
-            onSubmit={() => {
-              console.log("Submitting form...");
-            }}
+            onSubmit={handleAddStaffSubmit}
           />
         </div>
 
@@ -178,8 +245,8 @@ export default function StaffPage() {
             label: "Full Name",
             type: "text",
             placeholder: "Enter full name",
-            value: editFormState.name,
-            setValue: (value: string) => handleEditInputChange("name", value),
+            value: editFormState.fullName,
+            setValue: (value: string) => handleEditInputChange("fullName", value),
           },
           {
             id: "role",
@@ -203,9 +270,7 @@ export default function StaffPage() {
               handleEditInputChange("username", value),
           },
         ]}
-        onSubmit={() => {
-          console.log("Submitting form...");
-        }}
+        onSubmit={handleUpdateStaffSubmit}
         isOpen={isEditDialogOpen}
         setOpen={setIsEditDialogOpen}
       />
@@ -215,9 +280,7 @@ export default function StaffPage() {
         dialogTitle="Remove Staff"
         dialogDescription="Are you sure you want to remove this staff member?"
         formFields={[]}
-        onSubmit={() => {
-          console.log("Removing staff...");
-        }}
+        onSubmit={handleRemoveStaffSubmit}
         isOpen={isRemoveDialogOpen}
         setOpen={setIsRemoveDialogOpen}
       />

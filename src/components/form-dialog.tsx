@@ -37,11 +37,7 @@ interface FormDialogProps {
   onSubmit: (data: Record<string, string>) => void;
 }
 
-const schema = yup.object().shape({
-  email: yup
-    .string()
-    .email("Invalid email format")
-    .required("Email is required"),
+const validationFields = {
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -50,9 +46,24 @@ const schema = yup.object().shape({
     .string()
     .oneOf([yup.ref("password"), undefined], "Passwords must match")
     .required("Password is required"),
-});
+  name: yup.string().required("Name is required"),
+  username: yup.string().required("Username is required"),
+}
 
-const validationFields = Object.keys(schema.fields);
+const createSchema = (fields: FormField[]) => {
+  const schema = fields.reduce((acc, field) => {
+    if (field.type === "select") {
+      return acc;
+    }
+
+    return {
+      ...acc,
+      [field.id]: validationFields[field.id as keyof typeof validationFields],
+    };
+  }, {} as Record<string, yup.StringSchema>);
+
+  return yup.object().shape(schema);
+};
 
 export const FormDialog: React.FC<FormDialogProps> = ({
   trigger = <DialogTrigger asChild />,
@@ -68,11 +79,14 @@ export const FormDialog: React.FC<FormDialogProps> = ({
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(createSchema(formFields)),
   });
 
-  const handleFormSubmit = (data: Record<string, string>) => {
-    onSubmit(data);
+  const handleFormSubmit = (data: { [x: string]: string | undefined }) => {
+    const filteredData = Object.fromEntries(
+      Object.entries(data).filter(([, value]) => value !== undefined)
+    ) as Record<string, string>;
+    onSubmit(filteredData);
     setOpen(false);
   };
 
@@ -110,20 +124,10 @@ export const FormDialog: React.FC<FormDialogProps> = ({
                     type={field.type}
                     value={field.value}
                     placeholder={field.placeholder}
-                    {...(validationFields.includes(field.type.toLowerCase())
-                      ? (() => {
-                          const registerField = field.type === "password" ? field.id.toLowerCase() : field.type.toLowerCase();
-                          return {
-                            ...register(registerField),
-                            onChange: (e) => {
-                              register(registerField).onChange(e);
-                              field.setValue(e.target.value);
-                            },
-                          };
-                        })()
-                      : {
-                          onChange: (e) => field.setValue(e.target.value),
-                        })}
+                    {...register(field.id)}  // Register the field properly here
+                    onChange={(e) => {
+                      field.setValue(e.target.value);
+                    }}
                   />
                 )}
                 {/* Display error message */}
