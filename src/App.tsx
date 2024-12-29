@@ -17,6 +17,7 @@ import { fetchUser } from "./api/auth/auth";
 import AdminLayout from "./pages/admin/components/layout";
 import TransactionPage from "./pages/admin/pages/transaction";
 import StaffPage from "./pages/admin/pages/staff";
+import EmpDashboardPage from "./pages/employee/Dashboard";
 
 function App() {
   const userStore = useUserStore((state) => state.user);
@@ -78,6 +79,12 @@ function App() {
         </Route>
       {/* <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
       </Route> */}
+      <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
+        <Route path="/employee/dashboard" element={<EmpDashboardPage />} />
+      </Route>
+      <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
+        <Route path="/admin/home" element={<h1>Admin home</h1>} />
+      </Route>
 
       <Route path="*" element={<UnImplementPage />} />
     </Routes>

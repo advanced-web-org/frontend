@@ -16,5 +16,6 @@ export async function getBanks(): Promise<Bank[]> {
       bank_name: item.bank_name,
     })
   );
+
   return banks;
 }

@@ -57,7 +57,7 @@ export default function ExternalForm() {
         <Label>Receiver account bank</Label>
         <Combobox
           choices={bankOptions}
-          value={receiverBankId || undefined}
+          value={receiverBankId ?? undefined}
           onSelect={(bankId) => setReceiverBankId(bankId)}
         />
       </div>

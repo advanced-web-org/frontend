@@ -1,10 +1,12 @@
 import { create } from "zustand";
 
 export interface User {
+  id: number;
   fullname: string;
   email: string;
   phone: string;
   role: string;
+  bank_id: number;
   accessToken: string;
   account_number: string;
   account_balance: number;
