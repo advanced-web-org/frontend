@@ -31,24 +31,26 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-import * as React from "react";
-import { DialogDemo } from "./Dialog";
+import { useState } from "react";
+import { AddCustomerDialog } from "./AddCustomerDialog";
+import { DepositDialog } from "./DepositDialog";
+import { TransactionDialog } from "./TransactionDialog";
 
 interface EmpTableProps {
   data: Customer[];
 }
 
 export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
-  const [dataState, setDataState] = React.useState<Customer[]>(data);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [account_number, setAccountNumber] = React.useState("");
+  const [dataState, setDataState] = useState<Customer[]>(data);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+  const [isDepositDialogOpen, setIsDepositDialogOpen] = useState(false);
+  const [isCreateCustomerDialogOpen, setIsCreateCustomerDialogOpen] =
+    useState(false);
+  const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
+  const [accountNumber, setAccountNumber] = useState("");
 
   const columns: ColumnDef<Customer>[] = [
     {
@@ -139,12 +141,14 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
         const account = row.original;
 
         const handleDeposit = (account_number: string) => {
-          setIsDialogOpen(true);
+          setIsDepositDialogOpen(true);
           setAccountNumber(account_number);
         };
 
-        const handleViewTransactionHistory = () => {
+        const handleViewTransactionHistory = (account_number: string) => {
           // Handle view transaction history
+          setIsTransactionDialogOpen(true);
+          setAccountNumber(account_number);
         };
 
         return (
@@ -162,7 +166,11 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
               >
                 Deposit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleViewTransactionHistory}>
+              <DropdownMenuItem
+                onClick={() =>
+                  handleViewTransactionHistory(account.account_number)
+                }
+              >
                 View transaction history
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -198,18 +206,42 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
 
   return (
     <div className="w-full">
-      {isDialogOpen && (
-        <DialogDemo
-          isOpen={isDialogOpen}
-          account={account_number}
+      {/* Deposit dialog */}
+      {isDepositDialogOpen && (
+        <DepositDialog
+          isOpen={isDepositDialogOpen}
+          account={accountNumber}
           onClose={() => {
             handleDataUpdate();
-            setIsDialogOpen(false);
+            setIsDepositDialogOpen(false);
           }}
         />
       )}
 
-      <div className="flex items-center py-4">
+      {/* Create customer dialog */}
+      {isCreateCustomerDialogOpen && (
+        <AddCustomerDialog
+          isOpen={isCreateCustomerDialogOpen}
+          onClose={() => {
+            handleDataUpdate();
+            setIsCreateCustomerDialogOpen(false);
+          }}
+        />
+      )}
+
+      {/* Transaction dialog */}
+      {isTransactionDialogOpen && (
+        <TransactionDialog
+          isOpen={isTransactionDialogOpen}
+          accountNumber={accountNumber}
+          onClose={() => {
+            handleDataUpdate();
+            setIsTransactionDialogOpen(false);
+          }}
+        />
+      )}
+
+      <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter emails..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
@@ -219,32 +251,38 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
           className="max-w-sm"
         />
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex gap-8">
+          <Button onClick={() => setIsCreateCustomerDialogOpen(true)}>
+            Create new customer
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="rounded-md border">

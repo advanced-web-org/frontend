@@ -14,7 +14,7 @@ import { useUserStore } from "./stores/userStore";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import { useEffect } from "react";
 import { fetchUser } from "./api/auth/auth";
-import EmpDashboardPage from "./pages/employee/dashboard";
+import EmpDashboardPage from "./pages/employee/Dashboard";
 
 function App() {
   const userStore = useUserStore((state) => state.user);

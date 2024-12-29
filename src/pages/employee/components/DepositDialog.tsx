@@ -13,17 +13,17 @@ import { Label } from "@/components/ui/label";
 import { useUserStore } from "@/stores/userStore";
 import { useState } from "react";
 
-interface DialogDemoProps {
+interface DepositDialogProps {
   isOpen: boolean;
   onClose: () => void;
   account: string | null;
 }
 
-export function DialogDemo({
+export function DepositDialog({
   isOpen,
   onClose,
   account,
-}: Readonly<DialogDemoProps>) {
+}: Readonly<DepositDialogProps>) {
   const [formData, setFormData] = useState({
     amount: 0,
     message: "",

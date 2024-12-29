@@ -12,7 +12,7 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "transaction_amount",
-    header: "",
+    header: "Amount",
   },
   {
     accessorKey: "transaction_message",
