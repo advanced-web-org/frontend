@@ -16,7 +16,7 @@ import { useState } from "react";
 export function LoginForm() {
   const navigate = useNavigate();
 
-  const [phone, setPhone] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const auth = useAuthStore((state) => state);
@@ -25,12 +25,12 @@ export function LoginForm() {
     e.preventDefault(); // Prevent form default submission behavior
 
     try {
-      const user = await auth.signin({ phone, password }); // Call the signin function from the AuthContext
+      const user = await auth.signin({ username, password }); // Call the signin function from the AuthContext
       if (user) {
         navigate(`/${user.role}/dashboard`); // Redirect to the user's home page based on their role
       }
     } catch (err) {
-      setError("Invalid phone number or password. Please try again."); // Display error message
+      setError("Invalid username number or password. Please try again."); // Display error message
     }
   };
 
@@ -46,12 +46,12 @@ export function LoginForm() {
         <form onSubmit={handleLogin}>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label>Phone number</Label>
+              <Label>Username number</Label>
               <Input
-                id="phone"
+                id="username"
                 type="text"
-                placeholder="Your phone number"
-                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Your username number"
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>

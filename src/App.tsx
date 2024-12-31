@@ -1,5 +1,10 @@
+import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { fetchUser } from "./api/auth/auth";
 import "./App.css";
+import AdminLayout from "./pages/admin/components/layout";
+import StaffPage from "./pages/admin/pages/staff";
+import TransactionPage from "./pages/admin/pages/transaction";
 import LoginPage from "./pages/auth/login";
 import RegisterPage from "./pages/auth/register";
 import UnauthorizePage from "./pages/common/unauthorize";
@@ -9,15 +14,10 @@ import BeneficiaryPage from "./pages/customer/pages/Beneficienary/beneficiary";
 import { DashboardPage } from "./pages/customer/pages/dashboard";
 import HistoryPage from "./pages/customer/pages/history";
 import TransferPage from "./pages/customer/pages/Transfer/transfer";
+import EmpDashboardPage from "./pages/employee/dashboard";
 import { useAuthStore } from "./stores/authStore";
 import { useUserStore } from "./stores/userStore";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
-import { useEffect } from "react";
-import { fetchUser } from "./api/auth/auth";
-import AdminLayout from "./pages/admin/components/layout";
-import TransactionPage from "./pages/admin/pages/transaction";
-import StaffPage from "./pages/admin/pages/staff";
-import EmpDashboardPage from "./pages/employee/Dashboard";
 
 function App() {
   const userStore = useUserStore((state) => state.user);
@@ -69,14 +69,14 @@ function App() {
           <Route path="settings" element={<h1>Settings</h1>} />
         </Route>
       </Route>
-        <Route path="/employee/home" element={<h1>Emp home</h1>} />
+      <Route path="/employee/home" element={<h1>Emp home</h1>} />
       {/* <Route element={<ProtectedRoutes allowedRoles={"employee"} />}> */}
       {/* </Route> */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="staffs" element={<StaffPage/>}/>
-          <Route path="transactions" element={<TransactionPage/>}/>
-          {/* <Route path="transactions" element={<TransactionPage/>}/> */}
-        </Route>
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="staffs" element={<StaffPage />} />
+        <Route path="transactions" element={<TransactionPage />} />
+        {/* <Route path="transactions" element={<TransactionPage/>}/> */}
+      </Route>
       {/* <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
       </Route> */}
       <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
