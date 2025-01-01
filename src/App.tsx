@@ -11,7 +11,7 @@ import UnauthorizePage from "./pages/common/unauthorize";
 import UnImplementPage from "./pages/common/unImplement";
 import Layout from "./pages/customer/components/layout";
 import BeneficiaryPage from "./pages/customer/pages/Beneficienary/beneficiary";
-import { DashboardPage } from "./pages/customer/pages/dashboard";
+import DashboardPage from "./pages/customer/pages/dashboard";
 import HistoryPage from "./pages/customer/pages/history";
 import TransferPage from "./pages/customer/pages/Transfer/transfer";
 import EmpDashboardPage from "./pages/employee/dashboard";
