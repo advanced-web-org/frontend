@@ -19,7 +19,7 @@ import ViewDebts from "./pages/debts/view-debts";
 import AdminLayout from "./pages/admin/components/layout";
 import TransactionPage from "./pages/admin/pages/transaction";
 import StaffPage from "./pages/admin/pages/staff";
-import EmpDashboardPage from "./pages/employee/Dashboard";
+import EmpDashboardPage from "./pages/employee/dashboard";
 
 function App() {
   const userStore = useUserStore((state) => state.user);
@@ -43,8 +43,6 @@ function App() {
       <Route path="/auth/login" element={<LoginPage />} />
       <Route path="/auth/register" element={<RegisterPage />} />
       <Route path="/unauthorized" element={<UnauthorizePage />} />
-      <Route path="/debts/create-debt" element={<CreateDebt />} />
-      <Route path="/debts/view-debts" element={<ViewDebts />} />
 
       <Route
         path="/"
@@ -63,24 +61,27 @@ function App() {
         }
       />
 
-      <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
+      {/* <Route element={<ProtectedRoutes allowedRoles={"user"} />}> */}
         <Route path="/user" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="transfer" element={<TransferPage />} />
-          <Route path="debt" element={<h1>Debt</h1>} />
+          <Route path="debt">
+            <Route path="create" element={<CreateDebt />} />
+            <Route path="" element={<ViewDebts />} />
+          </Route>
           <Route path="beneficiary" element={<BeneficiaryPage />} />
           <Route path="history" element={<HistoryPage />} />
           <Route path="settings" element={<h1>Settings</h1>} />
         </Route>
-      </Route>
-        <Route path="/employee/home" element={<h1>Emp home</h1>} />
+      {/* </Route> */}
+      <Route path="/employee/home" element={<h1>Emp home</h1>} />
       {/* <Route element={<ProtectedRoutes allowedRoles={"employee"} />}> */}
       {/* </Route> */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="staffs" element={<StaffPage/>}/>
-          <Route path="transactions" element={<TransactionPage/>}/>
-          {/* <Route path="transactions" element={<TransactionPage/>}/> */}
-        </Route>
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="staffs" element={<StaffPage />} />
+        <Route path="transactions" element={<TransactionPage />} />
+        {/* <Route path="transactions" element={<TransactionPage/>}/> */}
+      </Route>
       {/* <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
       </Route> */}
       <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>

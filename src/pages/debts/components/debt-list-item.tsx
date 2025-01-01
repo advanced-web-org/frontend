@@ -23,8 +23,8 @@ const DebtListItem = ({ debt, tab }: { debt: Debt, tab: Tab }) => {
       bounce-item
       border border-gray-200"
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-20">
-        <div className="flex flex-col w-3/5">
+      <div className="flex flex-row justify-between gap-20">
+        <div className="w-3/5">
           {tab === Tab.CREDITOR && <p className="text-lg font-semibold">Debtor: {debt.debtor.full_name}</p>}
           {tab === Tab.DEBTOR && <p className="text-lg font-semibold">Creditor: {debt.creditor.full_name}</p>}
           <p className="italic text-gray-500 text-sm">Message</p>
@@ -40,12 +40,12 @@ const DebtListItem = ({ debt, tab }: { debt: Debt, tab: Tab }) => {
           <p className="text-gray-500 text-sm">
             Created: {new Date(debt.created_at).toLocaleDateString()}
           </p>
-        </div>
-      </div>
 
-      <div className="flex flex-row justify-end gap-4 mt-4">
-        {tab === Tab.DEBTOR && <Button className={getButtonClass()}>Pay</Button>}
-        <Button className={getButtonClass()} variant="destructive">Delete</Button>
+          <div className="flex flex-row justify-end gap-4 mt-4">
+            {tab === Tab.DEBTOR && <Button className={getButtonClass()}>Pay</Button>}
+            <Button className={getButtonClass()} variant="destructive">Delete</Button>
+          </div>
+        </div>
       </div>
     </div>
   );

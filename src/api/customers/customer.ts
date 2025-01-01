@@ -41,3 +41,14 @@ export async function getCustomerWithAccounts(): Promise<Customer[]> {
 
   return customers;
 }
+
+export interface CustomerV2 {
+  customer_id: number;
+  full_name: string;
+}
+
+export async function getCustomerByAccountNumber(accountNumber: string): Promise<CustomerV2> {
+  return await api
+    .get<CustomerV2>(`/customers/by-account-number/${accountNumber}`)
+    .then((response) => response.data);
+}
