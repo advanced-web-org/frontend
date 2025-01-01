@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Combobox } from "./combobox";
+import { useEffect } from "react";
 
 interface FormField {
   id: string;
@@ -48,7 +49,7 @@ const validationFields = {
     .required("Password is required"),
   name: yup.string().required("Name is required"),
   username: yup.string().required("Username is required"),
-}
+};
 
 const createSchema = (fields: FormField[]) => {
   const schema = fields.reduce((acc, field) => {
@@ -78,9 +79,17 @@ export const FormDialog: React.FC<FormDialogProps> = ({
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({
     resolver: yupResolver(createSchema(formFields)),
   });
+
+  // Sync external state with form fields when it changes
+  useEffect(() => {
+    formFields.forEach((field) => {
+      setValue(field.id, field.value); // <-- Update form value dynamically
+    });
+  }, [formFields, setValue]); // Runs when `formFields` change
 
   const handleFormSubmit = (data: { [x: string]: string | undefined }) => {
     const filteredData = Object.fromEntries(
@@ -124,7 +133,7 @@ export const FormDialog: React.FC<FormDialogProps> = ({
                     type={field.type}
                     value={field.value}
                     placeholder={field.placeholder}
-                    {...register(field.id)}  // Register the field properly here
+                    {...register(field.id)} // Register the field properly here
                     onChange={(e) => {
                       field.setValue(e.target.value);
                     }}

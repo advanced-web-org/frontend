@@ -1,25 +1,30 @@
-import { create } from "zustand";
-import { User, useUserStore } from "./userStore";
 import {
   signin as ApiSignin,
   signup as ApiSignup,
   CreateUserDto,
 } from "@/api/auth/auth"; // API call to authenticate the user
+import { create } from "zustand";
+import { User, useUserStore } from "./userStore";
 
-export interface Auth {
-  phone: string;
+export interface IAuth {
+  username: string;
   password: string;
 }
 
 type AuthStore = {
   accessToken: string | null;
+  set: (state: { accessToken: string }) => void;
   signup: (user: CreateUserDto) => Promise<User | null>;
-  signin: (auth: Auth) => Promise<User | null>;
+  signin: (auth: IAuth) => Promise<User | null>;
   signout: () => void;
 };
 
 export const useAuthStore = create<AuthStore>((set) => ({
   accessToken: "",
+
+  set: (state) => {
+    set(state);
+  },
 
   signup: async (userDTO) => {
     try {
@@ -38,13 +43,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
   signin: async (auth) => {
     try {
       const response = await ApiSignin(auth);
-      console.log("signin response", response);
 
-      const user: User = response;
-      useUserStore.getState().setUser(user);
-      set({ accessToken: user.accessToken });
+      useAuthStore.getState().set({ accessToken: response.accessToken });
 
-      return user;
+      return response;
     } catch (error) {
       console.error(error);
       return null;

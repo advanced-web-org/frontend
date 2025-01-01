@@ -33,13 +33,10 @@ export async function updateStaff(staff: {
 }): Promise<Staff> {
   const response = await api
     .post(`${import.meta.env.VITE_DOMAIN}/staffs/update`, staff)
-    .then((res) => {
-      console.log("Updated staff", res);
-      return res.data;
-    });
+    .then((res) => res.data);
   return response;
 }
 
 export async function deleteStaff(staffId: number): Promise<void> {
-  await api.delete(`${import.meta.env.VITE_DOMAIN}/staffs/${staffId}`);
+  await api.post(`${import.meta.env.VITE_DOMAIN}/staffs/delete/${staffId}`);
 }

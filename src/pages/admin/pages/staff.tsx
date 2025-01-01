@@ -28,11 +28,9 @@ export default function StaffPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<any>(null);
-  const [editFormState, setEditFormState] = useState({
-    fullName: "",
-    username: "",
-    role: "",
-  });
+  const [editFullname, setEditFullname] = useState("");
+  const [editUsername, setEditUsername] = useState("");
+  const [editRole, setEditRole] = useState("");
 
   const handleSearchChange = (searchTerm: string) => {
     setColumnFilters((prev) => {
@@ -50,10 +48,17 @@ export default function StaffPage() {
   };
 
   const handleEditInputChange = (key: string, value: string) => {
-    setEditFormState((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+    switch (key) {
+      case "fullName":
+        setEditFullname(value);
+        break;
+      case "username":
+        setEditUsername(value);
+        break;
+      case "role":
+        setEditRole(value);
+        break;
+    }
   };
 
   const handleRemove = (staffId: number) => {
@@ -66,14 +71,11 @@ export default function StaffPage() {
 
   const handleEdit = (staffId: number) => {
     const staff = data.find((staff) => staff.staff_id === staffId);
-    console.log("Editing staff", staff);
     if (staff) {
       handleRowSelection(staff);
-      setEditFormState({
-        fullName: staff.full_name,
-        username: staff.username,
-        role: staff.role,
-      });
+      setEditFullname(staff.full_name);
+      setEditUsername(staff.username);
+      setEditRole(staff.role);
     }
     setIsEditDialogOpen(true);
   };
@@ -100,15 +102,10 @@ export default function StaffPage() {
   };
 
   const handleUpdateStaffSubmit = async () => {
-    console.log("Updating staff...", {
-      fullName: editFormState.fullName,
-      username: editFormState.username,
-      role: editFormState.role
-    });
     await updateStaff({
-      fullName: editFormState.fullName,
-      username: editFormState.username,
-      role: editFormState.role,
+      fullName: editFullname,
+      username: editUsername,
+      role: editRole,
     })
       .then((staff) => {
         setData((prev) => {
@@ -245,15 +242,16 @@ export default function StaffPage() {
             label: "Full Name",
             type: "text",
             placeholder: "Enter full name",
-            value: editFormState.fullName,
-            setValue: (value: string) => handleEditInputChange("fullName", value),
+            value: editFullname,
+            setValue: (value: string) =>
+              handleEditInputChange("fullName", value),
           },
           {
             id: "role",
             label: "Role",
             type: "select",
             placeholder: "Select role",
-            value: editFormState.role,
+            value: editRole,
             choices: [
               { value: "admin", label: "Admin" },
               { value: "employee", label: "Employee" },
@@ -265,7 +263,7 @@ export default function StaffPage() {
             label: "Username",
             type: "text",
             placeholder: "Enter username",
-            value: editFormState.username,
+            value: editUsername,
             setValue: (value: string) =>
               handleEditInputChange("username", value),
           },

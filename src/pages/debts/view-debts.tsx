@@ -12,16 +12,11 @@ import NotificationsPopover from "./components/debt-notification";
 
 const ViewDebts = () => {
   let userStore = useUserStore((state) => state.user);
-  userStore = {
-    id: 1,
-    fullname: "John Doe",
-    email: "",
-    phone: "",
-    role: "",
-    bank_id: 1,
-    accessToken: "",
-    account_number: "1234567890",
-    account_balance: 1000,
+
+  // throw error when userStore is null
+  console.log("userStore kiet", userStore);
+  if (!userStore) {
+    throw new Error("User not found");
   }
 
   const navigate = useNavigate();
