@@ -52,3 +52,15 @@ export async function getCustomerByAccountNumber(accountNumber: string): Promise
     .get<CustomerV2>(`/customers/by-account-number/${accountNumber}`)
     .then((response) => response.data);
 }
+
+export async function getCustomerNameWithAccountNumber(
+  accountNumber: string
+): Promise<{ fullName: string; accountNumber: string }> {
+  try {
+    const response = await api.get(`${import.meta.env.VITE_DOMAIN}/customers/account/${accountNumber}`)
+
+    return response.data;
+  } catch {
+    return { fullName: "", accountNumber: "" };
+  }
+}
