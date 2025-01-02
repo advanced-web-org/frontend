@@ -34,7 +34,7 @@ function App() {
       .catch((error) => {
         console.error("Failed to fetch user:", error);
       });
-  }, [accessToken, setUser]);
+  }, [accessToken]);
 
   return (
     <Routes>
@@ -47,7 +47,9 @@ function App() {
         element={
           accessToken ? (
             <>
-              {userStore?.role === "user" && <Navigate to="user/dashboard" />}
+              {userStore?.role === "customer" && (
+                <Navigate to="customer/dashboard" />
+              )}
               {userStore?.role === "employee" && (
                 <Navigate to="/employee/home" />
               )}
@@ -59,8 +61,8 @@ function App() {
         }
       />
 
-      <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
-        <Route path="/user" element={<Layout />}>
+      <Route element={<ProtectedRoutes allowedRoles={"customer"} />}>
+        <Route path="/customer" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="transfer" element={<TransferPage />} />
           <Route path="debt" element={<h1>Debt</h1>} />
@@ -69,6 +71,7 @@ function App() {
           <Route path="settings" element={<h1>Settings</h1>} />
         </Route>
       </Route>
+
       <Route path="/employee/home" element={<h1>Emp home</h1>} />
       {/* <Route element={<ProtectedRoutes allowedRoles={"employee"} />}> */}
       {/* </Route> */}
@@ -79,6 +82,7 @@ function App() {
       </Route>
       {/* <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
       </Route> */}
+
       <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
         <Route path="/employee/dashboard" element={<EmpDashboardPage />} />
       </Route>
