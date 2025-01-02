@@ -53,7 +53,6 @@ export async function signin({ username, password }: IAuth): Promise<any> {
     .then((response) => {
       return response.data.data;
     });
-  console.log("responseData", responseData);
 
   localStorage.setItem("refresh_token", responseData.refreshToken);
   localStorage.setItem("username", responseData.username);

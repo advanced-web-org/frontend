@@ -67,13 +67,13 @@ export function CustomerSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const isActive = location.pathname === `/user${item.url}`; // Check active route.
+                const isActive = location.pathname === `/customer${item.url}`; // Check active route.
 
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild size={"lg"}>
                       <NavLink
-                        to={`/user${item.url}`}
+                        to={`/customer${item.url}`}
                         className={`pl-10 flex items-center gap-2 rounded-md ${
                           isActive && "bg-teal-200" // Active styles
                         }`}

@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { fetchUser } from "./api/auth/auth";
 import "./App.css";
+import AdminLayout from "./pages/admin/components/layout";
+import StaffPage from "./pages/admin/pages/staff";
+import TransactionPage from "./pages/admin/pages/transaction";
 import LoginPage from "./pages/auth/login";
 import RegisterPage from "./pages/auth/register";
 import UnauthorizePage from "./pages/common/unauthorize";
@@ -14,12 +18,8 @@ import EmpDashboardPage from "./pages/employee/dashboard";
 import { useAuthStore } from "./stores/authStore";
 import { useUserStore } from "./stores/userStore";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
-import { fetchUser } from "./api/auth/auth";
-import CreateDebt from "./pages/debts/create-debt";
 import ViewDebts from "./pages/debts/view-debts";
-import AdminLayout from "./pages/admin/components/layout";
-import TransactionPage from "./pages/admin/pages/transaction";
-import StaffPage from "./pages/admin/pages/staff";
+import CreateDebt from "./pages/debts/create-debt";
 
 function App() {
   const userStore = useUserStore((state) => state.user);
@@ -36,7 +36,7 @@ function App() {
       .catch((error) => {
         console.error("Failed to fetch user:", error);
       });
-  }, [accessToken, setUser]);
+  }, [accessToken]);
 
   return (
     <Routes>
@@ -49,7 +49,9 @@ function App() {
         element={
           accessToken ? (
             <>
-              {userStore?.role === "user" && <Navigate to="user/dashboard" />}
+              {userStore?.role === "customer" && (
+                <Navigate to="customer/dashboard" />
+              )}
               {userStore?.role === "employee" && (
                 <Navigate to="/employee/home" />
               )}
@@ -61,8 +63,8 @@ function App() {
         }
       />
 
-      <Route element={<ProtectedRoutes allowedRoles={"user"} />}>
-        <Route path="/user" element={<Layout />}>
+      <Route element={<ProtectedRoutes allowedRoles={"customer"} />}>
+        <Route path="/customer" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="transfer" element={<TransferPage />} />
           <Route path="debt">
@@ -74,6 +76,7 @@ function App() {
           <Route path="settings" element={<h1>Settings</h1>} />
         </Route>
       </Route>
+
       <Route path="/employee/home" element={<h1>Emp home</h1>} />
       {/* <Route element={<ProtectedRoutes allowedRoles={"employee"} />}> */}
       {/* </Route> */}
@@ -84,6 +87,7 @@ function App() {
       </Route>
       {/* <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
       </Route> */}
+
       <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
         <Route path="/employee/dashboard" element={<EmpDashboardPage />} />
       </Route>

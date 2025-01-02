@@ -4,7 +4,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 
 interface ProtectedRoutesProps {
-  allowedRoles: "user" | "employee" | "admin";
+  allowedRoles: "customer" | "employee" | "admin";
 }
 
 const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ allowedRoles }) => {
