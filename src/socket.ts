@@ -14,7 +14,7 @@ export interface ServerToClientEvents {
 let socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
 
 export const connectSocket = (token: string, userId: number) => {
-  socket = io("http://localhost:3000", {
+  socket = io("http://localhost:3001", {
     query: { token },
   });
 

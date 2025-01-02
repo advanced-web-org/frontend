@@ -5,7 +5,6 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_DOMAIN,
   timeout: 5000, // Optional timeout in milliseconds
 });
-const temp_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyIn0.hxg7RmVNesGiy3rf-jR1o6NGVE6B_e4SthSjGrtUCz8"
 
 // Optionally, set default headers for all requests
 api.defaults.headers.common["Content-Type"] = "application/json";

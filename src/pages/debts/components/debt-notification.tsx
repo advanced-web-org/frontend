@@ -23,6 +23,8 @@ const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) =
     queryFn: () => getNotifications(userId),
   });
 
+  console.log("kiet notifications", notifications);
+
   return (
     <Popover>
       <PopoverTrigger>
@@ -47,7 +49,7 @@ const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) =
             <p className="text-center text-red-500">Error loading debts</p>
           ) : notifications && notifications.length > 0 ? (
             notifications.map((noti) => (
-              <NotificationItem noti={noti} />
+              <NotificationItem key={noti.notification_id} noti={noti} />
             ))
           ) : (
             <p className="text-gray-500">No new notifications</p>
@@ -77,7 +79,6 @@ const NotificationItem: React.FC<{ noti: DebtNotification }> = ({ noti }) => {
 
   return (
     <div
-      key={noti.notification_id}
       className={
         "border-b p-4 mb-2 rounded-md shadow-sm cursor-pointer transition-all " +
         (isRead ? "bg-white" : "bg-gray-100 border-l-4 border-gray-500")
