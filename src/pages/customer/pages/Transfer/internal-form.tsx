@@ -108,7 +108,7 @@ export default function InternalForm() {
       </div>
 
       <div className="flex gap-2 justify-between items-center">
-        <Label>Account number</Label>
+        <Label>Transfer message</Label>
         <Input
           value={transactionMessage}
           onChange={(e) => setTransactionMessage(e.target.value)}
