@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { useUserStore } from "@/stores/userStore";
 import { useState } from "react";
 import { getCustomerNameWithAccountNumber } from "@/api/customers/customer";
+import Switch from '@mui/material/Switch';
 
 export default function InternalForm() {
   const userStore = useUserStore((state) => state.user);
@@ -13,6 +14,7 @@ export default function InternalForm() {
   const [transactionMessage, setTransactionMessage] = useState("");
   const [feePaidBy, setFeePaidBy] = useState("sender");
   const [receiverName, setReceiverName] = useState("");
+  const [isSavedAsContact, setIsSavedAsContact] = useState(true);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +25,7 @@ export default function InternalForm() {
       amount: transactionAmount.replace(' VNĐ', '').replace(/\D/g, ''),
       message: transactionMessage,
       feePayer: feePaidBy,
+      isSavedAsContact,
     });
   };
 
@@ -33,7 +36,7 @@ export default function InternalForm() {
       return;
     };
     setReceiverName(result.fullName);
-  }
+  };
 
   return (
     <form className="grid gap-6" onSubmit={handleSubmit}>
@@ -57,6 +60,17 @@ export default function InternalForm() {
             type="text"
             readOnly
             className="w-4/5 h-12 bg-gray-100"
+          />
+        </div>
+      )}
+
+      {receiverName && (
+        <div className="flex gap-2 justify-end items-center">
+          <span className="font-semibold">Save as contact</span>
+          <Switch 
+            color="primary"
+            onChange={() => setIsSavedAsContact(!isSavedAsContact)}
+            defaultChecked={isSavedAsContact}
           />
         </div>
       )}
