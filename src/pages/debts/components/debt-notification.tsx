@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosNotifications, IoIosNotificationsOutline } from "react-icons/io";
 import {
   Popover,
@@ -7,15 +7,24 @@ import {
 } from "@/components/ui/popover";
 import { getNotifications, markNotificationAsRead, DebtNotification } from "../api/notfication.api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { connectSocket, getSocket, LiveDebtNotification } from "@/socket";
+import { toast } from "sonner";
+import { useAuthStore } from "@/stores/authStore";
+
 
 type NotificationsPopoverProps = {
   userId: number;
 };
 
 const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) => {
+  const { accessToken } = useAuthStore((state) => state);
+  const [liveNotifications, setLiveNotifications] = useState<DebtNotification[]>([]);
+  const queryClient = useQueryClient();
 
+
+  // Fetch notifications using React Query
   const {
-    data: notifications,
+    data: notifications = [], // Default to empty array
     isLoading,
     isError,
   } = useQuery({
@@ -23,12 +32,48 @@ const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) =
     queryFn: () => getNotifications(userId),
   });
 
-  console.log("kiet notifications", notifications);
+  // Handle new notifications from WebSocket
+  useEffect(() => {
+    let socket = getSocket();
+    if (!socket) {
+      if (!accessToken) {
+        console.error("Access token not found");
+        return;
+      }
+      socket = connectSocket(accessToken, userId);
+      return;
+    }
+
+    const handleNewNotification = (noti: LiveDebtNotification) => {
+      console.log("New notification:", noti);
+
+      const newNoti: DebtNotification = {
+        notification_id: parseInt(noti.timestamp),
+        message: noti.message,
+        created_at: new Date(noti.timestamp).toISOString(),
+        is_read: false,
+      };
+
+      setLiveNotifications((prev) => [newNoti, ...prev]); // Add to live notifications
+      queryClient.invalidateQueries({ queryKey: ["debtNotifications"] }); // Refresh the list
+      toast.message(noti.message); // Show a toast notification
+    };
+
+    socket.on("debtNotifications", handleNewNotification);
+
+    // Cleanup on unmount
+    return () => {
+      socket.off("debtNotifications");
+    };
+  }, [userId]);
+
+  // Combine live and fetched notifications
+  const allNotifications = [...liveNotifications, ...notifications];
 
   return (
     <Popover>
       <PopoverTrigger>
-        {notifications && notifications.some((noti) => !noti.is_read) ? (
+        {allNotifications.some((noti) => !noti.is_read) ? (
           <IoIosNotifications size={32} className="cursor-pointer" />
         ) : (
           <IoIosNotificationsOutline size={32} className="cursor-pointer" />
@@ -44,15 +89,15 @@ const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) =
         </div>
         <div className="mt-2 space-y-2">
           {isLoading ? (
-            <l-bouncy size="45" speed="1.75" color="black"></l-bouncy>
+            <div className="text-center p-4">Loading...</div>
           ) : isError ? (
-            <p className="text-center text-red-500">Error loading debts</p>
-          ) : notifications && notifications.length > 0 ? (
-            notifications.map((noti) => (
-              <NotificationItem key={noti.notification_id} noti={noti} />
+            <p className="text-center text-red-500">Error loading notifications</p>
+          ) : allNotifications.length > 0 ? (
+            allNotifications.map((noti, index) => (
+              <NotificationItem key={index} noti={noti} />
             ))
           ) : (
-            <p className="text-gray-500">No new notifications</p>
+            <p className="text-gray-500 text-center p-4">No new notifications</p>
           )}
         </div>
       </PopoverContent>
@@ -62,10 +107,9 @@ const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) =
 
 export default NotificationsPopover;
 
-
 const NotificationItem: React.FC<{ noti: DebtNotification }> = ({ noti }) => {
   const [isRead, setIsRead] = useState(noti.is_read);
-  const queryClient = useQueryClient(); // Access query client
+  const queryClient = useQueryClient();
 
   const handleNotificationClick = async () => {
     try {

@@ -1,5 +1,4 @@
 import { io, Socket } from "socket.io-client";
-import { DebtNotification } from "./pages/debts/api/notfication.api";
 
 // socket-events.ts
 export interface ClientToServerEvents {
@@ -7,9 +6,15 @@ export interface ClientToServerEvents {
 }
 
 export interface ServerToClientEvents {
-  debtNotifications: (data: DebtNotification) => void;
+  debtNotifications: (data: LiveDebtNotification) => void;
 }
 
+export interface LiveDebtNotification {
+  message: string;
+  debtId: number;
+  timestamp: string;
+  action: string;
+}
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
 
@@ -24,6 +29,10 @@ export const connectSocket = (token: string, userId: number) => {
     // Join the user's specific room
     socket?.emit("join", userId);
   });
+
+  // socket.on("debtNotifications", (data) => {
+  //   console.log("New debt notification:", data);
+  // } );
 
   socket.on("disconnect", () => {
     console.log("Disconnected from WebSocket server");
