@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/authStore";
 import { useState } from "react";
+import { connectSocket } from "@/socket";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -27,6 +28,10 @@ export function LoginForm() {
     try {
       const user = await auth.signin({ username, password }); // Call the signin function from the AuthContext
       if (user) {
+
+        // connect to a socket server to listen for notifications
+        const { accessToken, id } = user;
+        connectSocket(accessToken, id);
         navigate(`/${user.role}/dashboard`); // Redirect to the user's home page based on their role
       }
     } catch (err) {

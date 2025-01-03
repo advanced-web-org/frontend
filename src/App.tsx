@@ -18,6 +18,8 @@ import EmpDashboardPage from "./pages/employee/dashboard";
 import { useAuthStore } from "./stores/authStore";
 import { useUserStore } from "./stores/userStore";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
+import ViewDebts from "./pages/debts/view-debts";
+import CreateDebt from "./pages/debts/create-debt";
 
 function App() {
   const userStore = useUserStore((state) => state.user);
@@ -65,7 +67,10 @@ function App() {
         <Route path="/customer" element={<Layout />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="transfer" element={<TransferPage />} />
-          <Route path="debt" element={<h1>Debt</h1>} />
+          <Route path="debt">
+            <Route path="create" element={<CreateDebt />} />
+            <Route path="" element={<ViewDebts />} />
+          </Route>
           <Route path="beneficiary" element={<BeneficiaryPage />} />
           <Route path="history" element={<HistoryPage />} />
           <Route path="settings" element={<h1>Settings</h1>} />

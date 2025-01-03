@@ -59,7 +59,7 @@ export async function signin({ username, password }: IAuth): Promise<any> {
 
   // Map the response data directly into the `User` object
   return {
-    id: responseData.userId,
+    id: responseData.id,
     fullname: responseData.fullname,
     email: responseData.email,
     username: responseData.username,

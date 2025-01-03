@@ -2,6 +2,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
+import { toast } from "sonner";
 
 interface ProtectedRoutesProps {
   allowedRoles: "customer" | "employee" | "admin";
@@ -11,7 +12,7 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ allowedRoles }) => {
   const user = useUserStore.getState().user;
   const [loading, setLoading] = useState(true);
 
-  console.log("user", user);
+  console.log("kiet user", user);
 
   useEffect(() => {
     if (user !== null) {
@@ -25,6 +26,7 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ allowedRoles }) => {
 
   if (!user) {
     // Redirect to login if no user is authenticated
+    // toast.error("You need to Login first")
     return <Navigate to="auth/login" replace />;
   }
 
