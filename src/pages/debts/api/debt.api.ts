@@ -20,3 +20,13 @@ export async function deleteDebt(debtId: number): Promise<any> {
   const response = await api.delete(`/debts/${debtId}`);
   return response.data;
 }
+
+export interface InitiateDebtPaymentDto {
+  otpToken: string;
+  message: string;
+}
+
+export async function initiateDebtPayment(debtId: number): Promise<InitiateDebtPaymentDto> {
+  const response = await api.get(`/debts/${debtId}/initiate-debt-payment`);
+  return response.data;
+}
