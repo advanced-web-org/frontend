@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import DebtTabs, { Tab } from "@/components/debts/debt-tabs";
-import { Debt } from "./types/debt.type";
+import { Debt, DebtStatus } from "./types/debt.type";
 import { getDebtsAsCreditor, getDebtsAsDebtor } from "./api/debt.api";
 import { useQuery } from "@tanstack/react-query";
 import { bouncy } from "ldrs";

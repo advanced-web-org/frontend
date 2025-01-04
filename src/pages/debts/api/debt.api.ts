@@ -15,3 +15,8 @@ export async function createDebt(debt: any): Promise<any> {
   const response = await api.post("/debts", debt);
   return response.data;
 }
+
+export async function deleteDebt(debtId: number): Promise<any> {
+  const response = await api.delete(`/debts/${debtId}`);
+  return response.data;
+}

@@ -2,22 +2,38 @@ import { Badge, badgeVariants } from "@/components/ui/badge";
 import { Debt, DebtStatus } from "../types/debt.type";
 import { Button } from "@/components/ui/button";
 import { Tab } from "@/components/debts/debt-tabs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import DeleteDebtDialog from "./delete-debt-dialog";
+import { deleteDebt } from "../api/debt.api";
 
-const getStatusClass = (status: DebtStatus) => {
-  return badgeVariants({ variant: status });
-}
+const getStatusClass = (status: DebtStatus) => badgeVariants({ variant: status });
 
-const getStatusDisplay = (status: DebtStatus) => {
-  return status.toUpperCase();
-}
+const getStatusDisplay = (status: DebtStatus) => status.toUpperCase();
 
-const getButtonClass = () => {
-  return "w-16"
-}
+export const getButtonClass = () => "w-16";
 
-const DebtListItem = ({ debt, tab }: { debt: Debt, tab: Tab }) => {
+const DebtListItem = ({ debt, tab }: { debt: Debt; tab: Tab }) => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: deleteDebt,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["debtsAsDebtor"] });
+      queryClient.invalidateQueries({ queryKey: ["debtsAsCreditor"] });
+    },
+  });
+
+  const handleDelete = async () => {
+    try {
+      await mutation.mutateAsync(debt.debt_id);
+    } catch (error) {
+      console.error("Failed to delete debt:", error);
+    }
+  };
+
   return (
-    <div className="
+    <div
+      className="
       debt-item p-4 mb-4
       rounded-md shadow-md
       bounce-item
@@ -42,13 +58,22 @@ const DebtListItem = ({ debt, tab }: { debt: Debt, tab: Tab }) => {
           </p>
 
           <div className="flex flex-row justify-end gap-4 mt-4">
-            {tab === Tab.DEBTOR && <Button className={getButtonClass()}>Pay</Button>}
-            <Button className={getButtonClass()} variant="destructive">Delete</Button>
+            {shouldDisplayPayButton(debt.status, tab) && <Button className={getButtonClass()}>Pay</Button>}
+            {shouldDisplayDeleteButton(debt.status) && <DeleteDebtDialog className={getButtonClass()} debtId={debt.debt_id} onDelete={handleDelete} />}
           </div>
         </div>
       </div>
+
     </div>
   );
 };
 
 export default DebtListItem;
+
+const shouldDisplayPayButton = (debtStatus: DebtStatus, tab: Tab): boolean => {
+  return tab === Tab.DEBTOR && debtStatus === DebtStatus.unpaid;
+}
+
+const shouldDisplayDeleteButton = (debtStatus: DebtStatus): boolean => {
+  return debtStatus !== DebtStatus.deleted;
+}
