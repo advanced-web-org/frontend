@@ -5,6 +5,8 @@ import { useUserStore } from "@/stores/userStore";
 import { useState } from "react";
 import { getCustomerNameWithAccountNumber } from "@/api/customers/customer";
 import Switch from '@mui/material/Switch';
+import OTPInput from "@/components/ui/otp-input";
+import { requestOtpForTransaction } from "@/api/transactions/transaction";
 
 export default function InternalForm() {
   const userStore = useUserStore((state) => state.user);
@@ -16,7 +18,7 @@ export default function InternalForm() {
   const [receiverName, setReceiverName] = useState("");
   const [isSavedAsContact, setIsSavedAsContact] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Perform the internal transfer API call here
     console.log({
@@ -27,6 +29,8 @@ export default function InternalForm() {
       feePayer: feePaidBy,
       isSavedAsContact,
     });
+
+    await requestOtpForTransaction();
   };
 
   const fetchRecipientInfo = async () => {
@@ -140,6 +144,7 @@ export default function InternalForm() {
           Transfer
         </Button>
       </div>
+      <OTPInput />
     </form>
   );
 }

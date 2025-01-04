@@ -59,3 +59,12 @@ export async function getExternalBalance(externalBankId?: number): Promise<objec
     .then((res) => res.data);
   return response;
 }
+
+export async function requestOtpForTransaction(): Promise<void> {
+  const response = await api
+    .post(`${import.meta.env.VITE_DOMAIN}/transactions/request_otp`)
+    .then((res) => res.data);
+  
+  console.log(response);
+  return response
+}
