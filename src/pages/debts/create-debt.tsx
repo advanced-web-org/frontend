@@ -12,19 +12,6 @@ import { useNavigate } from "react-router-dom";
 
 const CreateDebt = () => {
   let userStore = useUserStore((state) => state.user);
-
-  userStore = {
-    id: 2,
-    fullname: "John Doe",
-    email: "",
-    phone: "",
-    role: "",
-    bank_id: 1,
-    accessToken: "",
-    account_number: "1234567890",
-    account_balance: 1000,
-  }
-
   const navigate = useNavigate();
 
   bouncy.register();
@@ -35,7 +22,7 @@ const CreateDebt = () => {
     queryKey: ["customer", accountNumber],
     queryFn: () => getCustomerByAccountNumber(accountNumber!),
     enabled: !!accountNumber,
-    retry: 2,
+    retry: false,
   });
 
   useEffect(() => {
@@ -80,7 +67,7 @@ const CreateDebt = () => {
 
       resetForm(); // Reset the form after successful submission
       setAccountNumber(""); // Clear the account number field
-      navigate("/user/debt"); // Redirect to the debts page
+      navigate("/customer/debt"); // Redirect to the debts page
     } catch (error) {
       console.error("Error creating debt:", error);
       // Show error message or handle error logic here
