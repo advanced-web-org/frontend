@@ -5,6 +5,7 @@ import { Tab } from "@/components/debts/debt-tabs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import DeleteDebtDialog from "./delete-debt-dialog";
 import { deleteDebt } from "../api/debt.api";
+import { numberToCurrency } from "@/utils/currency.utils";
 
 const getStatusClass = (status: DebtStatus) => badgeVariants({ variant: status });
 
@@ -48,7 +49,7 @@ const DebtListItem = ({ debt, tab }: { debt: Debt; tab: Tab }) => {
         </div>
         <div className="flex flex-col items-end gap-2 w-1/4 max-w-1/2">
           <p className="text-lg font-semibold">
-            Amount: <span className="text-blue-500">${debt.debt_amount}</span>
+            Amount: <span className="text-blue-500">{numberToCurrency(debt.debt_amount)}</span>
           </p>
           <Badge className={`font-medium ${getStatusClass(debt.status)}`}>
             {getStatusDisplay(debt.status)}
