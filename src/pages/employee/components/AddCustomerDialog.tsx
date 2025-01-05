@@ -165,7 +165,12 @@ export function AddCustomerDialog({
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" onClick={handleSubmit} variant="default">
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              variant="default"
+              className="bg-teal-600"
+            >
               Create
             </Button>
           </DialogFooter>

@@ -12,10 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/authStore";
 import { useState } from "react";
-import { connectSocket } from "@/socket";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,10 +26,21 @@ export function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent form default submission behavior
 
+    if (!executeRecaptcha) {
+      console.error("reCAPTCHA not loaded");
+      return;
+    }
+
+    try {
+      const token = await executeRecaptcha("login");
+      console.log(token);
+    } catch (err) {
+      console.error("reCAPTCHA error", err);
+    }
+
     try {
       const user = await auth.signin({ username, password }); // Call the signin function from the AuthContext
       if (user) {
-
         navigate(`/${user.role}/dashboard`); // Redirect to the user's home page based on their role
       }
     } catch (err) {
@@ -78,6 +90,7 @@ export function LoginForm() {
             <Button type="submit" className="w-full">
               Login
             </Button>
+
             <Button variant="outline" className="w-full">
               Login with Google
             </Button>

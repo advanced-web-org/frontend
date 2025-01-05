@@ -117,8 +117,13 @@ export function DepositDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button type="button" onClick={handleSubmit} variant="default">
-            Save changes
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            variant="default"
+            className="bg-teal-600"
+          >
+            Deposit
           </Button>
         </DialogFooter>
       </DialogContent>

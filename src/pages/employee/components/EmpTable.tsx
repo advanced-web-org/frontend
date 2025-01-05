@@ -206,7 +206,7 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
   }
 
   return (
-    <div className="w-full">
+    <div className="">
       {/* Deposit dialog */}
       {isDepositDialogOpen && (
         <DepositDialog
@@ -290,7 +290,7 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
       </div>
 
       <div className="rounded-md border">
-        <Table>
+        <Table className="">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
