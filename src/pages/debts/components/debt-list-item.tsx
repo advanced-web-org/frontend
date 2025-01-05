@@ -9,6 +9,7 @@ import OtpDialog from "./otp-dialog";
 import { Button } from "@/components/ui/button";
 import { ring } from 'ldrs'
 import { usePayment } from "../hooks/payment";
+import { DebtDeletePopover } from "./debt-delete-popover";
 
 const getStatusClass = (status: DebtStatus) => badgeVariants({ variant: status });
 
@@ -19,9 +20,9 @@ export const getButtonClass = () => "w-16";
 const DebtListItem = ({ debt, tab }: { debt: Debt; tab: Tab }) => {
   ring.register()
   const queryClient = useQueryClient();
-  const handleDelete = async () => {
+  const handleDelete = async (deleteMessage: string) => {
     try {
-      await deleteDebt(debt.debt_id);
+      await deleteDebt(debt.debt_id, deleteMessage);
       queryClient.invalidateQueries({ queryKey: ["debtsAsDebtor"] });
       queryClient.invalidateQueries({ queryKey: ["debtsAsCreditor"] });
     } catch (error) {
@@ -51,9 +52,12 @@ const DebtListItem = ({ debt, tab }: { debt: Debt; tab: Tab }) => {
           <p className="text-lg font-semibold">
             <span className="text-blue-500">{numberToCurrency(debt.debt_amount)}</span>
           </p>
-          <Badge className={`font-medium ${getStatusClass(debt.status)}`}>
-            {getStatusDisplay(debt.status)}
-          </Badge>
+          <div className="flex flex-row gap-2">
+            {debt.status === DebtStatus.deleted && <DebtDeletePopover debt={debt} />}
+            <Badge className={`font-medium flex justify-center ${getStatusClass(debt.status)}`}>
+              {getStatusDisplay(debt.status)}
+            </Badge>
+          </div>
           <p className="text-gray-500 text-sm">
             Created: {new Date(debt.created_at).toLocaleDateString()}
           </p>
@@ -81,7 +85,6 @@ const DebtListItem = ({ debt, tab }: { debt: Debt; tab: Tab }) => {
             {shouldDisplayDeleteButton(debt.status) && (
               <DeleteDebtDialog
                 className={getButtonClass()}
-                debtId={debt.debt_id}
                 onDelete={handleDelete}
               />
             )}

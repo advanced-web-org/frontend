@@ -16,8 +16,8 @@ export async function createDebt(debt: any): Promise<any> {
   return response.data;
 }
 
-export async function deleteDebt(debtId: number): Promise<any> {
-  const response = await api.delete(`/debts/${debtId}`);
+export async function deleteDebt(debtId: number, deleteMessage: string): Promise<any> {
+  const response = await api.delete(`/debts/${debtId}`, { data: { delete_message: deleteMessage } });
   return response.data;
 }
 
