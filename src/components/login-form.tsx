@@ -29,9 +29,6 @@ export function LoginForm() {
       const user = await auth.signin({ username, password }); // Call the signin function from the AuthContext
       if (user) {
 
-        // connect to a socket server to listen for notifications
-        const { accessToken, id } = user;
-        connectSocket(accessToken, id);
         navigate(`/${user.role}/dashboard`); // Redirect to the user's home page based on their role
       }
     } catch (err) {

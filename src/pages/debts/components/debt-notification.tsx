@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { IoIosNotifications, IoIosNotificationsOutline } from "react-icons/io";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { getNotifications, markNotificationAsRead, DebtNotification } from "../api/notfication.api";
+import { getNotifications, DebtNotification } from "../api/notfication.api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { connectSocket, getSocket, LiveDebtNotification } from "@/socket";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
+import NotificationItem from "./notification-item";
 
 
 type NotificationsPopoverProps = {
@@ -18,63 +19,64 @@ type NotificationsPopoverProps = {
 
 const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) => {
   const { accessToken } = useAuthStore((state) => state);
-  const [liveNotifications, setLiveNotifications] = useState<DebtNotification[]>([]);
+  const [liveNotification, setLiveNotification] = useState<DebtNotification>();
   const queryClient = useQueryClient();
 
 
-  // Fetch notifications using React Query
-  const {
-    data: notifications = [], // Default to empty array
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: notifications = [], isLoading, isError } = useQuery({
     queryKey: ["debtNotifications"],
-    queryFn: () => getNotifications(userId),
+    queryFn: () => {
+      setLiveNotification(undefined); // Clear live notification before fetching
+      return getNotifications(userId);
+    }
   });
 
   // Handle new notifications from WebSocket
-  useEffect(() => {
-    let socket = getSocket();
-    if (!socket) {
-      if (!accessToken) {
-        console.error("Access token not found");
-        return;
-      }
-      socket = connectSocket(accessToken, userId);
-      return;
-    }
-
-    const handleNewNotification = (noti: LiveDebtNotification) => {
-      console.log("New notification:", noti);
-
+  const handleNewNotification = useCallback(
+    (noti: LiveDebtNotification) => {
       const newNoti: DebtNotification = {
-        notification_id: parseInt(noti.timestamp),
+        notification_id: noti.notificationId,
         message: noti.message,
         created_at: new Date(noti.timestamp).toISOString(),
         is_read: false,
       };
 
-      setLiveNotifications((prev) => [newNoti, ...prev]); // Add to live notifications
-      queryClient.invalidateQueries({ queryKey: ["debtNotifications"] }); // Refresh the list
-      toast.message(noti.message); // Show a toast notification
-    };
+      console.log("New notification:", newNoti);
+
+      setLiveNotification(newNoti); // Update live notification
+      queryClient.invalidateQueries({ queryKey: ["debtNotifications"], refetchType: "none" }); // next time we fetch, chung ta call api thay vi lay tu cache
+      toast.success(noti.message);
+    },
+    [queryClient]
+  );
+
+  useEffect(() => {
+    if (!accessToken) {
+      throw new Error("Access token is required to connect to WebSocket");
+    }
+    const socket = getSocket() || connectSocket(accessToken, userId);
 
     socket.on("debtNotifications", handleNewNotification);
 
-    // Cleanup on unmount
+    // Cleanup listener on unmount
     return () => {
-      socket.off("debtNotifications");
+      socket.off("debtNotifications", handleNewNotification);
     };
-  }, [userId]);
+  }, [accessToken, userId, handleNewNotification]);
 
   // Combine live and fetched notifications
-  const allNotifications = [...liveNotifications, ...notifications];
+  const allNotifications = liveNotification ? [liveNotification, ...notifications] : notifications;
 
   return (
     <Popover>
       <PopoverTrigger>
         {allNotifications.some((noti) => !noti.is_read) ? (
-          <IoIosNotifications size={32} className="cursor-pointer" />
+          <div className="relative">
+            <div className="absolute -top-0.5 -right-0.5 text-xs text-black bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center">
+              {allNotifications.filter((noti) => !noti.is_read).length}
+            </div>
+            <IoIosNotifications size={32} className="cursor-pointer" />
+          </div>
         ) : (
           <IoIosNotificationsOutline size={32} className="cursor-pointer" />
         )}
@@ -93,8 +95,8 @@ const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) =
           ) : isError ? (
             <p className="text-center text-red-500">Error loading notifications</p>
           ) : allNotifications.length > 0 ? (
-            allNotifications.map((noti, index) => (
-              <NotificationItem key={index} noti={noti} />
+            allNotifications.map(noti => (
+              <NotificationItem key={noti.notification_id} noti={noti} />
             ))
           ) : (
             <p className="text-gray-500 text-center p-4">No new notifications</p>
@@ -106,31 +108,3 @@ const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) =
 };
 
 export default NotificationsPopover;
-
-const NotificationItem: React.FC<{ noti: DebtNotification }> = ({ noti }) => {
-  const [isRead, setIsRead] = useState(noti.is_read);
-  const queryClient = useQueryClient();
-
-  const handleNotificationClick = async () => {
-    try {
-      await markNotificationAsRead(noti.notification_id);
-      setIsRead(true); // Update the local state to reflect the "read" status
-      queryClient.invalidateQueries({ queryKey: ["debtNotifications"] });
-    } catch (error) {
-      console.error("Failed to mark notification as read:", error);
-    }
-  };
-
-  return (
-    <div
-      className={
-        "border-b p-4 mb-2 rounded-md shadow-sm cursor-pointer transition-all " +
-        (isRead ? "bg-white" : "bg-gray-100 border-l-4 border-gray-500")
-      }
-      onClick={handleNotificationClick}
-    >
-      <p className="text-gray-800 font-medium">{noti.message}</p>
-      <p className="text-gray-500 text-xs">{new Date(noti.created_at).toLocaleString()}</p>
-    </div>
-  );
-}

@@ -9,22 +9,10 @@ import { createDebt } from "./api/debt.api";
 import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
 import { useNavigate } from "react-router-dom";
+import BeneficiariesPopover from "./components/beneficiaries-popover";
 
 const CreateDebt = () => {
   let userStore = useUserStore((state) => state.user);
-
-  userStore = {
-    id: 2,
-    fullname: "John Doe",
-    email: "",
-    phone: "",
-    role: "",
-    bank_id: 1,
-    accessToken: "",
-    account_number: "1234567890",
-    account_balance: 1000,
-  }
-
   const navigate = useNavigate();
 
   bouncy.register();
@@ -35,7 +23,7 @@ const CreateDebt = () => {
     queryKey: ["customer", accountNumber],
     queryFn: () => getCustomerByAccountNumber(accountNumber!),
     enabled: !!accountNumber,
-    retry: 2,
+    retry: false,
   });
 
   useEffect(() => {
@@ -80,7 +68,7 @@ const CreateDebt = () => {
 
       resetForm(); // Reset the form after successful submission
       setAccountNumber(""); // Clear the account number field
-      navigate("/user/debt"); // Redirect to the debts page
+      navigate("/customer/debt"); // Redirect to the debts page
     } catch (error) {
       console.error("Error creating debt:", error);
       // Show error message or handle error logic here
@@ -108,7 +96,7 @@ const CreateDebt = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form className="space-y-6">
             {/* Account Number Input */}
             <div>
@@ -118,14 +106,20 @@ const CreateDebt = () => {
               >
                 Account Number
               </label>
-              <Field
-                type="text"
-                name="account_number"
-                id="account_number"
-                className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter account number"
-                onBlur={handleAccountNumberOnBlur}
-              />
+              <div className="flex items-center gap-2">
+                <Field
+                  type="text"
+                  name="account_number"
+                  id="account_number"
+                  className="w-full flex-1 mt-1 p-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter account number"
+                  onBlur={(handleAccountNumberOnBlur)}
+                />
+                <BeneficiariesPopover onAccountPick={(accountNumber) => {
+                  setAccountNumber(accountNumber);
+                  setFieldValue("account_number", accountNumber); // Update Formik field
+                }} />
+              </div>
               <ErrorMessage
                 name="account_number"
                 component="div"
@@ -196,7 +190,7 @@ const CreateDebt = () => {
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="bg-blue-500 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-600"
+                className="text-white px-6 py-2 rounded-md shadow-md hover:opacity-90"
                 disabled={isSubmitting || isSelfDebt}
               >
                 {isSubmitting ? "Creating..." : "Create Reminder"}

@@ -10,10 +10,10 @@ export interface ServerToClientEvents {
 }
 
 export interface LiveDebtNotification {
+  notificationId: number;
   message: string;
-  debtId: number;
+  userMessage?: string;
   timestamp: string;
-  action: string;
 }
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
@@ -29,10 +29,6 @@ export const connectSocket = (token: string, userId: number) => {
     // Join the user's specific room
     socket?.emit("join", userId);
   });
-
-  // socket.on("debtNotifications", (data) => {
-  //   console.log("New debt notification:", data);
-  // } );
 
   socket.on("disconnect", () => {
     console.log("Disconnected from WebSocket server");

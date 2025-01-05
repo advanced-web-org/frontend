@@ -14,6 +14,11 @@ export type Debt = {
   creditor: {
     customer_id: number;
     full_name: string;
+  },
+  debtDeletion: {
+    deleter_id: number;
+    delete_message: string;
+    created_at: string;
   }
 };
 
