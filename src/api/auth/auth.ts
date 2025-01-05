@@ -12,33 +12,27 @@ export interface CreateUserDto {
 export async function signup(userData: CreateUserDto): Promise<User> {
   // Simulate a signup request
 
-  const response = await api.post(
-    `${import.meta.env.VITE_DOMAIN}/auth/signup`,
-    {
+  const response = await api
+    .post(`${import.meta.env.VITE_DOMAIN}/auth/register_customer`, {
       ...userData,
-    }
-  );
-  const {
-    resId,
-    resFullname,
-    resEmail,
-    resPhone,
-    role,
-    account_number,
-    account_balance,
-    access_token,
-  } = response.data;
+    })
+    .catch((error) => {
+      console.error("Failed to create user:", error);
+      throw error;
+    });
+
+  const responseData = response.data.data;
 
   const user: User = {
-    id: resId,
-    fullname: resFullname,
-    email: resEmail,
-    phone: resPhone,
+    id: responseData.id,
+    fullname: responseData.fullName,
+    email: responseData.email,
+    phone: responseData.phone,
     bank_id: 1,
-    account_number,
-    account_balance,
-    role,
-    accessToken: access_token,
+    account_number: responseData.account_number,
+    account_balance: responseData.account_balance,
+    role: responseData.role,
+    accessToken: responseData.accessToken,
   };
 
   return user;

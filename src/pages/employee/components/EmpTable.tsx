@@ -49,6 +49,7 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
   const [isDepositDialogOpen, setIsDepositDialogOpen] = useState(false);
   const [isCreateCustomerDialogOpen, setIsCreateCustomerDialogOpen] =
     useState(false);
+
   const [isTransactionDialogOpen, setIsTransactionDialogOpen] = useState(false);
   const [accountNumber, setAccountNumber] = useState("");
 
@@ -251,11 +252,7 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
           className="max-w-sm"
         />
 
-        <div className="flex gap-8">
-          <Button onClick={() => setIsCreateCustomerDialogOpen(true)}>
-            Create new customer
-          </Button>
-
+        <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
@@ -282,6 +279,13 @@ export function EmployeeTable({ data }: Readonly<EmpTableProps>) {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Button
+            onClick={() => setIsCreateCustomerDialogOpen(true)}
+            className="bg-teal-600"
+          >
+            New
+          </Button>
         </div>
       </div>
 

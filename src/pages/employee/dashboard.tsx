@@ -22,9 +22,15 @@ export default function EmpDashboardPage() {
   }
 
   return (
-    <div className="w-screen h-screen p-4">
-      <p className="text 2-xl">staff</p>
-      <EmployeeTable data={customers} />
+    <div className="w-screen h-screen">
+      <div className="h-16 pl-10 flex justify-between items-center bg-teal-500">
+        <div className="text-2xl text-white font-bold">
+          Speechless Bank Staff System
+        </div>
+      </div>
+      <div className="p-4">
+        <EmployeeTable data={customers} />
+      </div>
     </div>
   );
 }
