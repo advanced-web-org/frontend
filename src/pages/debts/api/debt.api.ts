@@ -30,3 +30,8 @@ export async function initiateDebtPayment(debtId: number): Promise<InitiateDebtP
   const response = await api.get(`/debts/${debtId}/initiate-debt-payment`);
   return response.data;
 }
+
+export async function payDebt(debtId: number, otpCode: string, otpToken: string): Promise<any> {
+  const response = await api.post(`/debts/${debtId}/confirm-debt-payment`, { otp: otpCode, otp_token: otpToken });
+  return response.data;
+}
