@@ -71,7 +71,12 @@ const NotificationsPopover: React.FC<NotificationsPopoverProps> = ({ userId }) =
     <Popover>
       <PopoverTrigger>
         {allNotifications.some((noti) => !noti.is_read) ? (
-          <IoIosNotifications size={32} className="cursor-pointer" />
+          <div className="relative">
+            <div className="absolute -top-0.5 -right-0.5 text-xs text-black bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center">
+              {allNotifications.filter((noti) => !noti.is_read).length}
+            </div>
+            <IoIosNotifications size={32} className="cursor-pointer" />
+          </div>
         ) : (
           <IoIosNotificationsOutline size={32} className="cursor-pointer" />
         )}
