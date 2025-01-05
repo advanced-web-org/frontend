@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { initiateDebtPayment, payDebt, InitiateDebtPaymentDto } from "../api/debt.api";
 import { userOtpStore } from "@/stores/otpStore";
 import { toast } from "sonner";
+import { set } from "date-fns";
 
 export const usePayment = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +38,7 @@ export const usePayment = () => {
     } catch (error) {
       console.error("Failed to initiate payment:", error);
     } finally {
+      setError(null);
       setIsLoading(false);
     }
   };
