@@ -20,7 +20,7 @@ export const usePayment = () => {
       queryClient.invalidateQueries({ queryKey: ["debtsAsCreditor"] });
       setError(null); // Clear error on success
       setIsDialogOpen(false); // Close dialog only on success
-      toast("Debt reminder created successfully!");
+      toast("Debt paid successfully!");
     },
     onError: (err: any) => {
       console.error("Failed to pay debt:", err);

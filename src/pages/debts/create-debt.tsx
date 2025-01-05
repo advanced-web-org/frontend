@@ -183,7 +183,7 @@ const CreateDebt = () => {
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="bg-blue-500 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-600"
+                className="text-white px-6 py-2 rounded-md shadow-md hover:opacity-90"
                 disabled={isSubmitting || isSelfDebt}
               >
                 {isSubmitting ? "Creating..." : "Create Reminder"}

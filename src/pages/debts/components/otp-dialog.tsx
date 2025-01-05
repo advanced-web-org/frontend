@@ -74,7 +74,7 @@ const OtpDialog: React.FC<OtpDialogProps> = ({ onPay, isOpen, onClose, isPaying,
                 <Button
                   type="submit"
                   disabled={isSubmitting || isPaying}
-                  className="bg-blue-500 text-white hover:bg-blue-600"
+                  className="text-white hover:opacity-90"
                 >
                   {isPaying ? (
                     <l-ring size="20" stroke="2" speed="2" color="white" />
