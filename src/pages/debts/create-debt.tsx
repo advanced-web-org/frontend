@@ -9,6 +9,7 @@ import { createDebt } from "./api/debt.api";
 import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
 import { useNavigate } from "react-router-dom";
+import BeneficiariesPopover from "./components/beneficiaries-popover";
 
 const CreateDebt = () => {
   let userStore = useUserStore((state) => state.user);
@@ -95,7 +96,7 @@ const CreateDebt = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form className="space-y-6">
             {/* Account Number Input */}
             <div>
@@ -105,14 +106,20 @@ const CreateDebt = () => {
               >
                 Account Number
               </label>
-              <Field
-                type="text"
-                name="account_number"
-                id="account_number"
-                className="w-full mt-1 p-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter account number"
-                onBlur={handleAccountNumberOnBlur}
-              />
+              <div className="flex items-center gap-2">
+                <Field
+                  type="text"
+                  name="account_number"
+                  id="account_number"
+                  className="w-full flex-1 mt-1 p-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter account number"
+                  onBlur={(handleAccountNumberOnBlur)}
+                />
+                <BeneficiariesPopover onAccountPick={(accountNumber) => {
+                  setAccountNumber(accountNumber);
+                  setFieldValue("account_number", accountNumber); // Update Formik field
+                }} />
+              </div>
               <ErrorMessage
                 name="account_number"
                 component="div"
