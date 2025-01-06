@@ -1,26 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 
 interface OTPInputProps {
-  isInternal: boolean;
   onOtpSubmit: () => void;
+  otp: string[];
+  setOtp: (otp: string[]) => void;
 }
 
 let currentOTPIndex: number = 0;
-const OTPInput: React.FC<OTPInputProps> = ({ isInternal, onOtpSubmit }) => {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+const OTPInput: React.FC<OTPInputProps> = ({ onOtpSubmit, otp, setOtp }) => {
   const [activeOTPIndex, setActiveOTPIndex] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleOnSubmit = () => {
-    if (isInternal) {
-      // Handle internal transfer OTP submission logic here
-      console.log("Internal transfer OTP submitted");
-    } else {
-      // Handle external transfer OTP submission logic here
-      console.log("External transfer OTP submitted");
-    }
-    console.log("OTP submitted: ", otp.join(""));
     onOtpSubmit();
   };
 

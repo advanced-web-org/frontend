@@ -1,23 +1,68 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import ExternalTransferForm from "./external-form";
 import InternalTransferForm from "./internal-form";
-import { Card } from "@mui/material";
+import { Card, Snackbar, Alert } from "@mui/material";
 import { CircleUserRound, MoveRight, CornerUpLeft } from "lucide-react";
 import { useUserStore } from "@/stores/userStore";
 import { useState } from "react";
 import OTPInput from "@/components/ui/otp-input";
+import { requestOtpForTransaction, verifyOtpForInternalTransaction } from "@/api/transactions/transaction";
+import { useNavigate } from "react-router-dom";
 
 export default function TransferPage() {
   const user = useUserStore((state) => state.user);
+  const navigate = useNavigate();
   const [isOtpInput, setIsOtpInput] = useState(false);
-
-  const handleOtpRequest = () => {
-    setIsOtpInput(true);
-  };
+  const [receiverAccountNumber, setReceiverAccountNumber] = useState("");
+  const [transactionAmount, setTransactionAmount] = useState("");
+  const [transactionMessage, setTransactionMessage] = useState("");
+  const [feePaidBy, setFeePaidBy] = useState("sender");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otpToken, setOtpToken] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleBack = () => {
     setIsOtpInput(false);
   };
+
+  const onRequestOtp = async () => {
+    // Perform the internal transfer API call here
+    console.log({
+      fromAccount: user?.account_number,
+      toAccount: receiverAccountNumber,
+      amount: transactionAmount.replace(' VNĐ', '').replace(/\D/g, ''),
+      message: transactionMessage,
+      feePayer: feePaidBy === "sender" ? "from" : "to",
+      isSavedAsContact: true,
+    });
+
+    const result = await requestOtpForTransaction();
+    if (!result) return;
+    setOtpToken(result.otpToken);
+    setIsOtpInput(true);
+  }
+
+  const onVerifyOtp = async () => {
+    await verifyOtpForInternalTransaction(otpToken, otp.join(''), {
+      type: "internal",
+      data: {
+        from_bank_id: 1,
+        from_account_number: user?.account_number,
+        to_bank_id: 1,
+        to_account_number: receiverAccountNumber,
+        transaction_type: "transaction",
+        transaction_amount: Number(transactionAmount.replace(' VNĐ', '').replace(/\D/g, '')),
+        transaction_message: transactionMessage,
+        fee_payer: feePaidBy === "sender" ? "from" : "to",
+        fee_amount: 1000
+      }
+    });
+
+    setShowSuccess(true);
+    setTimeout(() => {
+      navigate("/customer/dashboard");
+    }, 3000);
+  }
 
   return (
     <div className="container mx-auto p-2">
@@ -71,7 +116,17 @@ export default function TransferPage() {
               </TabsList>
 
               <TabsContent value="internal">
-                <InternalTransferForm onOtpRequest={() => handleOtpRequest()} />
+                <InternalTransferForm 
+                  onOtpRequest={onRequestOtp}
+                  receiverAccountNumber={receiverAccountNumber}
+                  setReceiverAccountNumber={setReceiverAccountNumber}
+                  transactionAmount={transactionAmount}
+                  setTransactionAmount={setTransactionAmount}
+                  transactionMessage={transactionMessage}
+                  setTransactionMessage={setTransactionMessage}
+                  feePaidBy={feePaidBy}
+                  setFeePaidBy={setFeePaidBy}
+                />
               </TabsContent>
               <TabsContent value="external">
                 <ExternalTransferForm />
@@ -80,8 +135,11 @@ export default function TransferPage() {
           </div>
         </div>
       ) : (
-        <OTPInput isInternal={true} onOtpSubmit={handleBack} />
+        <OTPInput otp={otp} setOtp={setOtp} onOtpSubmit={onVerifyOtp} />
       )}
+      <Snackbar open={showSuccess} autoHideDuration={3000}>
+        <Alert variant="filled" severity="success">This is a success Alert.</Alert>
+      </Snackbar>
     </div>
   );
 }

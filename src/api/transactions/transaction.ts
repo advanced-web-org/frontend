@@ -60,11 +60,24 @@ export async function getExternalBalance(externalBankId?: number): Promise<objec
   return response;
 }
 
-export async function requestOtpForTransaction(): Promise<void> {
+export async function requestOtpForTransaction(): Promise<any> {
   const response = await api
     .post(`${import.meta.env.VITE_DOMAIN}/transactions/request_otp`)
     .then((res) => res.data);
+
+  return {
+    otpToken: response.otpToken,
+  }
+}
+
+export async function verifyOtpForInternalTransaction(otpToken: string, otp: string, payload: any): Promise<any> {
+  const response = await api
+    .post(`${import.meta.env.VITE_DOMAIN}/transactions/verify_otp`, {
+      otpToken,
+      otp,
+      transaction: payload
+    })
+    .then((res) => res.data);
   
-  console.log(response);
-  return response
+  return response;
 }

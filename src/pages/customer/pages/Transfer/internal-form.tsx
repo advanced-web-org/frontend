@@ -1,39 +1,38 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUserStore } from "@/stores/userStore";
 import { useState } from "react";
 import { getCustomerNameWithAccountNumber } from "@/api/customers/customer";
 import Switch from '@mui/material/Switch';
-import { requestOtpForTransaction } from "@/api/transactions/transaction";
 
 interface InternalFormProps {
   onOtpRequest: () => void;
+  receiverAccountNumber: string;
+  setReceiverAccountNumber: (value: string) => void;
+  transactionAmount: string;
+  setTransactionAmount: (value: string) => void;
+  transactionMessage: string;
+  setTransactionMessage: (value: string) => void;
+  feePaidBy: string;
+  setFeePaidBy: (value: string) => void;
 }
 
-export default function InternalForm({ onOtpRequest }: InternalFormProps) {
-  const userStore = useUserStore((state) => state.user);
-
-  const [receiverAccountNumber, setReceiverAccountNumber] = useState("");
-  const [transactionAmount, setTransactionAmount] = useState("");
-  const [transactionMessage, setTransactionMessage] = useState("");
-  const [feePaidBy, setFeePaidBy] = useState("sender");
+export default function InternalForm({
+  onOtpRequest,
+  receiverAccountNumber,
+  setReceiverAccountNumber,
+  transactionAmount,
+  setTransactionAmount,
+  transactionMessage,
+  setTransactionMessage,
+  feePaidBy,
+  setFeePaidBy,
+}: InternalFormProps) {
   const [receiverName, setReceiverName] = useState("");
   const [isSavedAsContact, setIsSavedAsContact] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Perform the internal transfer API call here
-    console.log({
-      fromAccount: userStore?.account_number,
-      toAccount: receiverAccountNumber,
-      amount: transactionAmount.replace(' VNĐ', '').replace(/\D/g, ''),
-      message: transactionMessage,
-      feePayer: feePaidBy,
-      isSavedAsContact,
-    });
-
-    await requestOtpForTransaction();
     onOtpRequest();
   };
 
