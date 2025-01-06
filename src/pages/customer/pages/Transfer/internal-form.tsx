@@ -5,10 +5,13 @@ import { useUserStore } from "@/stores/userStore";
 import { useState } from "react";
 import { getCustomerNameWithAccountNumber } from "@/api/customers/customer";
 import Switch from '@mui/material/Switch';
-import OTPInput from "@/components/ui/otp-input";
 import { requestOtpForTransaction } from "@/api/transactions/transaction";
 
-export default function InternalForm() {
+interface InternalFormProps {
+  onOtpRequest: () => void;
+}
+
+export default function InternalForm({ onOtpRequest }: InternalFormProps) {
   const userStore = useUserStore((state) => state.user);
 
   const [receiverAccountNumber, setReceiverAccountNumber] = useState("");
@@ -31,6 +34,7 @@ export default function InternalForm() {
     });
 
     await requestOtpForTransaction();
+    onOtpRequest();
   };
 
   const fetchRecipientInfo = async () => {
@@ -144,7 +148,6 @@ export default function InternalForm() {
           Transfer
         </Button>
       </div>
-      <OTPInput />
     </form>
   );
 }
