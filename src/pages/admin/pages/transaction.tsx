@@ -138,9 +138,9 @@ export default function SimpleLineChart() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">${totalAmount}</div>
-              <p className="text-xs text-muted-foreground">
+              {/* <p className="text-xs text-muted-foreground">
                 +20.1% from last month
-              </p>
+              </p> */}
             </CardContent>
           </Card>
           <Card>
@@ -152,9 +152,9 @@ export default function SimpleLineChart() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">${highestAmount}</div>
-              <p className="text-xs text-muted-foreground">
+              {/* <p className="text-xs text-muted-foreground">
                 +180.1% from last month
-              </p>
+              </p> */}
             </CardContent>
           </Card>
           <Card>
@@ -166,16 +166,16 @@ export default function SimpleLineChart() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">${lowestAmount}</div>
-              <p className="text-xs text-muted-foreground">
+              {/* <p className="text-xs text-muted-foreground">
                 +19% from last month
-              </p>
+              </p> */}
             </CardContent>
           </Card>
         </div>
 
         <Card className="flex flex-col justify-between">
           <CardHeader className="items-center pb-0">
-            <CardTitle>Pie Chart - Donut with Text</CardTitle>
+            <CardTitle>Pie Chart - Transaction amount</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 pb-0">
             <ChartContainer
