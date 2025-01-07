@@ -8,6 +8,7 @@ import { useState } from "react";
 import OTPInput from "@/components/ui/otp-input";
 import { requestOtpForTransaction, verifyOtpForInternalTransaction } from "@/api/transactions/transaction";
 import { useNavigate } from "react-router-dom";
+import { createBeneficiary } from "@/api/beneficiaries/beneficiary";
 
 export default function TransferPage() {
   const user = useUserStore((state) => state.user);
@@ -20,6 +21,8 @@ export default function TransferPage() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [otpToken, setOtpToken] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [receiverName, setReceiverName] = useState("");
+  const [isSavedAsContact, setIsSavedAsContact] = useState(false);
 
   const handleBack = () => {
     setIsOtpInput(false);
@@ -57,6 +60,15 @@ export default function TransferPage() {
         fee_amount: 1000
       }
     });
+
+    try {
+      await createBeneficiary({
+        account_number: receiverAccountNumber,
+        bank_id: 1,
+      });
+    } catch (error) {
+      console.error(error)
+    }
 
     setShowSuccess(true);
     setTimeout(() => {
@@ -126,6 +138,10 @@ export default function TransferPage() {
                   setTransactionMessage={setTransactionMessage}
                   feePaidBy={feePaidBy}
                   setFeePaidBy={setFeePaidBy}
+                  receiverName={receiverName}
+                  setReceiverName={setReceiverName}
+                  isSavedAsContact={isSavedAsContact}
+                  setIsSavedAsContact={setIsSavedAsContact}
                 />
               </TabsContent>
               <TabsContent value="external">
@@ -138,7 +154,7 @@ export default function TransferPage() {
         <OTPInput otp={otp} setOtp={setOtp} onOtpSubmit={onVerifyOtp} />
       )}
       <Snackbar open={showSuccess} autoHideDuration={3000}>
-        <Alert variant="filled" severity="success">This is a success Alert.</Alert>
+        <Alert variant="filled" severity="success">Your transaction is successfully</Alert>
       </Snackbar>
     </div>
   );

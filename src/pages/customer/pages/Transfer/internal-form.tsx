@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
 import { getCustomerNameWithAccountNumber } from "@/api/customers/customer";
 import Switch from '@mui/material/Switch';
 
@@ -15,6 +14,10 @@ interface InternalFormProps {
   setTransactionMessage: (value: string) => void;
   feePaidBy: string;
   setFeePaidBy: (value: string) => void;
+  receiverName: string;
+  setReceiverName: (value: string) => void;
+  isSavedAsContact: boolean;
+  setIsSavedAsContact: (value: boolean) => void;
 }
 
 export default function InternalForm({
@@ -27,10 +30,11 @@ export default function InternalForm({
   setTransactionMessage,
   feePaidBy,
   setFeePaidBy,
+  receiverName,
+  setReceiverName,
+  isSavedAsContact,
+  setIsSavedAsContact
 }: InternalFormProps) {
-  const [receiverName, setReceiverName] = useState("");
-  const [isSavedAsContact, setIsSavedAsContact] = useState(true);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     onOtpRequest();

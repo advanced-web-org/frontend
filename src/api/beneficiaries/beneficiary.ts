@@ -27,3 +27,17 @@ export async function getBeneficiaries(): Promise<Beneficiary[]> {
   );
   return beneficiaries;
 }
+
+export async function createBeneficiary(data: {
+  account_number: string;
+  bank_id: number;
+  nickname?: string;
+}): Promise<boolean> {
+  const response = await api
+    .post(`${import.meta.env.VITE_DOMAIN}/beneficiaries`, data)
+    .then((res) => res.data);
+
+  console.log('res: ', response);
+  
+  return response;
+}
