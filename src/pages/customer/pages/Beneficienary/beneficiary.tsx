@@ -1,4 +1,4 @@
-import { Beneficiary, getBeneficiaries } from "@/api/beneficiaries/beneficiary";
+import { Beneficiary, getBeneficiaries, deleteBeneficiary, updateBeneficiary } from "@/api/beneficiaries/beneficiary";
 import { useEffect, useState } from "react";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,17 +7,44 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { Edit, Trash } from "lucide-react";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 
 export default function BeneficiaryPage() {
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentBeneficiary, setCurrentBeneficiary] = useState<Beneficiary | null>(null);
+  const [nickname, setNickname] = useState("");
+
+  const fetchData = async () => {
+    const data = await getBeneficiaries();
+    setBeneficiaries(data);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getBeneficiaries();
-      setBeneficiaries(data);
-    };
     fetchData();
   }, []);
+
+  const handleDelete = async (id: number) => {
+    await deleteBeneficiary(id);
+    setTimeout(() => {
+      fetchData();
+    }, 2000);
+  };
+
+  const handleEdit = (beneficiary: Beneficiary) => {
+    setCurrentBeneficiary(beneficiary);
+    setNickname(beneficiary.nickname);
+    setEditModalOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (currentBeneficiary) {
+      await updateBeneficiary(currentBeneficiary.beneficiary_id, { nickname });
+      setBeneficiaries(beneficiaries.map(b => b.beneficiary_id === currentBeneficiary.beneficiary_id ? { ...b, nickname } : b));
+      setEditModalOpen(false);
+    }
+  };
 
   return (
     <div className="container mx-auto p-2 flex flex-col justify-start gap-10">
@@ -34,6 +61,7 @@ export default function BeneficiaryPage() {
                 <TableCell><span className="font-semibold">Bank name</span></TableCell>
                 <TableCell><span className="font-semibold">Account Number</span></TableCell>
                 <TableCell><span className="font-semibold">Nickname</span></TableCell>
+                <TableCell><span className="font-semibold">Actions</span></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -47,12 +75,43 @@ export default function BeneficiaryPage() {
                   </TableCell>
                   <TableCell>{beneficiary.account_number}</TableCell>
                   <TableCell>{beneficiary.nickname}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-4">
+                      <Edit 
+                        className="cursor-pointer" 
+                        onClick={() => handleEdit(beneficiary)} 
+                      />
+                      <Trash 
+                        className="cursor-pointer" 
+                        onClick={() => handleDelete(beneficiary.beneficiary_id)} 
+                      />
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </div>
+      {/* Edit Modal */}
+      <Dialog open={editModalOpen} onClose={() => setEditModalOpen(false)}>
+        <DialogTitle>Edit Beneficiary</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Nickname"
+            type="text"
+            fullWidth
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
+          <Button onClick={handleSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

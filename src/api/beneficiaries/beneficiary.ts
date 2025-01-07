@@ -41,3 +41,19 @@ export async function createBeneficiary(data: {
   
   return response;
 }
+
+export async function deleteBeneficiary(id: number): Promise<boolean> {
+  const response = await api
+    .delete(`${import.meta.env.VITE_DOMAIN}/beneficiaries/${id}`)
+    .then((res) => res.data);
+
+  return response;
+}
+
+export async function updateBeneficiary(id: number, data: { nickname: string }): Promise<boolean> {
+  const response = await api
+    .put(`${import.meta.env.VITE_DOMAIN}/beneficiaries/${id}`, data)
+    .then((res) => res.data);
+
+  return response;
+}
