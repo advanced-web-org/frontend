@@ -20,7 +20,7 @@ export default function DashboardPage() {
       </div>
       {/* Account */}
       <div className="flex flex-col gap-4">
-        <h2 className="text-base font-medium">List accounts</h2>
+        <h2 className="text-base font-medium">Payment account</h2>
         <Card className="max-w-sm p-4 flex flex-col gap-3 justify-between">
           <div>
             <div className="flex items-center gap-4">
