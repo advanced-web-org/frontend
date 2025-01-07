@@ -29,7 +29,7 @@ export default function BeneficiaryPage() {
     await deleteBeneficiary(id);
     setTimeout(() => {
       fetchData();
-    }, 2000);
+    }, 1000);
   };
 
   const handleEdit = (beneficiary: Beneficiary) => {
@@ -41,8 +41,10 @@ export default function BeneficiaryPage() {
   const handleSave = async () => {
     if (currentBeneficiary) {
       await updateBeneficiary(currentBeneficiary.beneficiary_id, { nickname });
-      setBeneficiaries(beneficiaries.map(b => b.beneficiary_id === currentBeneficiary.beneficiary_id ? { ...b, nickname } : b));
-      setEditModalOpen(false);
+      setTimeout(() => {
+        fetchData();
+        setEditModalOpen(false);
+      }, 1000);
     }
   };
 
