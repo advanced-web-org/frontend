@@ -72,7 +72,8 @@ export default function TransferPage() {
 
     setShowSuccess(true);
     setTimeout(() => {
-      navigate("/customer/dashboard");
+      navigate("/customer/dashboard", { replace: true });
+      window.location.reload();
     }, 3000);
   }
 
