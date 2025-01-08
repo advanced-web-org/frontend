@@ -175,7 +175,8 @@ export default function InternalForm({
       <div className="flex gap-2 justify-center">
         <Button 
           type="submit"
-          className="h-12 w-full bg-teal-500 text-white hover:bg-teal-500" 
+          className="h-12 w-full"
+          style={{ backgroundColor: "#14B8A6", color: "#fff" }} 
         >
           Transfer
         </Button>

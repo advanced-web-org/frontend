@@ -23,22 +23,14 @@ export default function TransferPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [receiverName, setReceiverName] = useState("");
   const [isSavedAsContact, setIsSavedAsContact] = useState(false);
+  const [selectedBank, setSelectedBank] = useState(0);
+  const [isInternal, setIsInternal] = useState(true);
 
   const handleBack = () => {
     setIsOtpInput(false);
   };
 
   const onRequestOtp = async () => {
-    // Perform the internal transfer API call here
-    console.log({
-      fromAccount: user?.account_number,
-      toAccount: receiverAccountNumber,
-      amount: transactionAmount.replace(' VNĐ', '').replace(/\D/g, ''),
-      message: transactionMessage,
-      feePayer: feePaidBy === "sender" ? "from" : "to",
-      isSavedAsContact: true,
-    });
-
     const result = await requestOtpForTransaction();
     if (!result) return;
     setOtpToken(result.otpToken);
@@ -46,26 +38,43 @@ export default function TransferPage() {
   }
 
   const onVerifyOtp = async () => {
-    await verifyOtpForInternalTransaction(otpToken, otp.join(''), {
-      type: "internal",
-      data: {
-        from_bank_id: 1,
-        from_account_number: user?.account_number,
-        to_bank_id: 1,
-        to_account_number: receiverAccountNumber,
-        transaction_type: "transaction",
-        transaction_amount: Number(transactionAmount.replace(' VNĐ', '').replace(/\D/g, '')),
-        transaction_message: transactionMessage,
-        fee_payer: feePaidBy === "sender" ? "from" : "to",
-        fee_amount: 1000
-      }
-    });
+    if (isInternal) {
+      await verifyOtpForInternalTransaction(otpToken, otp.join(''), {
+        type: "internal",
+        data: {
+          from_bank_id: 1,
+          from_account_number: user?.account_number,
+          to_bank_id: 1,
+          to_account_number: receiverAccountNumber,
+          transaction_type: "transaction",
+          transaction_amount: Number(transactionAmount.replace(' VNĐ', '').replace(/\D/g, '')),
+          transaction_message: transactionMessage,
+          fee_payer: feePaidBy === "sender" ? "from" : "to",
+          fee_amount: 1000
+        }
+      });
+    } else {
+      await verifyOtpForInternalTransaction(otpToken, otp.join(''), {
+        type: "external",
+        data: {
+          from_bank_id: 1,
+          from_account_number: user?.account_number,
+          to_bank_id: selectedBank,
+          to_account_number: receiverAccountNumber,
+          transaction_type: "transaction",
+          transaction_amount: Number(transactionAmount.replace(' VNĐ', '').replace(/\D/g, '')),
+          transaction_message: transactionMessage,
+          fee_payer: feePaidBy === "sender" ? "from" : "to",
+          fee_amount: 1000
+        }
+      });
+    }
 
     if(isSavedAsContact) {
       try {
         await createBeneficiary({
           account_number: receiverAccountNumber,
-          bank_id: 1,
+          bank_id: isInternal ? 1 : selectedBank,
         });
       } catch (error) {
         console.error(error)
@@ -114,7 +123,7 @@ export default function TransferPage() {
           {/* Transfer to */}
           <div className="flex flex-col gap-2 w-1/2">
             <h2 className="text-base font-medium">Transfer to</h2>
-            <Tabs defaultValue="internal" className="w-view flex flex-col gap-6">
+            <Tabs defaultValue="internal" className="w-view flex flex-col gap-6" onValueChange={(value) => setIsInternal(value === "internal")}>
               <TabsList className="flex justify-center gap-4">
                 <TabsTrigger
                   value="internal"
@@ -148,7 +157,23 @@ export default function TransferPage() {
                 />
               </TabsContent>
               <TabsContent value="external">
-                <ExternalTransferForm />
+                <ExternalTransferForm 
+                  onOtpRequest={onRequestOtp}
+                  receiverAccountNumber={receiverAccountNumber}
+                  setReceiverAccountNumber={setReceiverAccountNumber}
+                  transactionAmount={transactionAmount}
+                  setTransactionAmount={setTransactionAmount}
+                  transactionMessage={transactionMessage}
+                  setTransactionMessage={setTransactionMessage}
+                  feePaidBy={feePaidBy}
+                  setFeePaidBy={setFeePaidBy}
+                  receiverName={receiverName}
+                  setReceiverName={setReceiverName}
+                  isSavedAsContact={isSavedAsContact}
+                  setIsSavedAsContact={setIsSavedAsContact}
+                  selectedBank={selectedBank}
+                  setSelectedBank={setSelectedBank}
+                />
               </TabsContent>
             </Tabs>
           </div>

@@ -1,105 +1,256 @@
-import { Combobox } from "@/components/combobox";
-import { Button } from "@/components/ui/button";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, MenuItem, Select } from "@mui/material";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useBankStore } from "@/stores/bankStore";
-import { useUserStore } from "@/stores/userStore";
-import { useEffect, useState } from "react";
+import { getExternalCustomerNameWithAccountNumber } from "@/api/customers/customer";
+import Switch from '@mui/material/Switch';
+import { NotebookTabs } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Beneficiary, getExternalBeneficiary } from "@/api/beneficiaries/beneficiary";
+import { getBanks } from "@/api/banks/bank";
 
-export default function ExternalForm() {
-  const userStore = useUserStore((state) => state.user);
+interface ExternalFormProps {
+  onOtpRequest: () => void;
+  receiverAccountNumber: string;
+  setReceiverAccountNumber: (value: string) => void;
+  transactionAmount: string;
+  setTransactionAmount: (value: string) => void;
+  transactionMessage: string;
+  setTransactionMessage: (value: string) => void;
+  feePaidBy: string;
+  setFeePaidBy: (value: string) => void;
+  receiverName: string;
+  setReceiverName: (value: string) => void;
+  isSavedAsContact: boolean;
+  setIsSavedAsContact: (value: boolean) => void;
+  selectedBank: number;
+  setSelectedBank: (value: number) => void;
+}
 
-  const [receiverBankId, setReceiverBankId] = useState<number | null>(null);
-  const [receiverAccountNumber, setReceiverAccountNumber] = useState("");
-  const [transactionAmount, setTransactionAmount] = useState("");
-  const [transactionMessage, setTransactionMessage] = useState("");
-
-  const bankStore = useBankStore((state) => state.banks);
-  const setBanks = useBankStore((state) => state.setBanks);
-
-  useEffect(() => {
-    // Fetch the banks list here
-    setBanks();
-  }, []);
-
-  const bankOptions = bankStore.map((bank) => ({
-    label: bank.bank_name,
-    value: bank.bank_id,
-  }));
-
-  const handleSubmit = (e: React.FormEvent) => {
+export default function ExternalForm({
+  onOtpRequest,
+  receiverAccountNumber,
+  setReceiverAccountNumber,
+  transactionAmount,
+  setTransactionAmount,
+  transactionMessage,
+  setTransactionMessage,
+  feePaidBy,
+  setFeePaidBy,
+  receiverName,
+  setReceiverName,
+  isSavedAsContact,
+  setIsSavedAsContact,
+  selectedBank,
+  setSelectedBank
+}: ExternalFormProps) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Perform the external transfer API call here
-    console.log({
-      fromAccount: userStore?.account_number,
-      toBank: receiverBankId,
-      toAccount: receiverAccountNumber,
-      amount: transactionAmount,
-      message: transactionMessage,
-    });
+    onOtpRequest();
   };
 
+  const fetchRecipientInfo = async () => {
+    const result = await getExternalCustomerNameWithAccountNumber(
+      banks.find(bank => bank.bank_id === selectedBank)?.bank_name || "",
+      receiverAccountNumber
+    );
+    if (!result) {
+      setReceiverName("");
+      return;
+    };
+    setReceiverName(result.fullName);
+  };
+
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+  const [beneficiaryModalOpen, setBeneficiaryModalOpen] = useState(false);
+
+  const fetchBeneficiaries = async () => {
+    const data = await getExternalBeneficiary();
+    setBeneficiaries(data);
+  };
+
+  useEffect(() => {
+    fetchBeneficiaries();
+  }, []);
+
+  const [banks, setBanks] = useState<{ bank_id: number, bank_name: string }[]>([]);
+  const fetchBanks = async () => {
+    const data = await getBanks();
+    const filteredBanks = data.filter(bank => bank.bank_id !== 1);
+    setBanks(filteredBanks);
+  };
+
+  const handleBeneficiarySelect = (beneficiary: Beneficiary) => {
+    setReceiverAccountNumber(beneficiary.account_number);
+    setReceiverName(beneficiary.nickname);
+    setBeneficiaryModalOpen(false);
+  };
+
+  useEffect(() => {
+    fetchBanks();
+  }, []);
+
   return (
-    <form className="grid gap-4" onSubmit={handleSubmit}>
-      <div className="flex flex-row gap-2 justify-between items-center h-7">
-        <Label className="w-fit">Your account</Label>
-        <p className="w-2/3">{userStore?.account_number}</p>
+    <form className="grid gap-6" onSubmit={handleSubmit}>
+      <div className="flex gap-2 justify-between items-center">
+        <Label>Bank</Label>
+        <Select
+          className="relative w-4/5 h-12"
+          value={selectedBank}
+          onChange={(e) => setSelectedBank(Number(e.target.value))}
+          displayEmpty
+        >
+          <MenuItem value="" disabled>Select Bank</MenuItem>
+          {banks.map((bank) => (
+            <MenuItem key={bank.bank_id} value={bank.bank_id}>{bank.bank_name}</MenuItem>
+          ))}
+        </Select>
+      </div>
+      <div className="flex gap-2 justify-between items-center">
+        <Label>Account number</Label>
+        <div className="relative w-4/5">
+          <Input
+            value={receiverAccountNumber}
+            onChange={(e) => setReceiverAccountNumber(e.target.value)}
+            onBlur={fetchRecipientInfo}
+            type="text"
+            placeholder="Account number"
+            className="w-full h-12 pr-10 items-center"
+          />
+          <NotebookTabs
+            size={40}
+            color="#14B8A6"
+            className="absolute inset-y-0 right-0 flex items-center pr-3 pt-2 cursor-pointer"
+            onClick={() => setBeneficiaryModalOpen(true)}
+          />
+        </div>
       </div>
 
-      <div className="flex flex-row gap-2 justify-between items-center h-7">
-        <Label className="w-fit">Your balance</Label>
-        <p className="w-2/3 font-bold text-teal-800">
-          {userStore?.account_balance} $
-        </p>
-      </div>
+      {receiverName && (
+        <div className="flex gap-2 justify-between items-center">
+          <Label>Account Name</Label>
+          <Input
+            value={receiverName}
+            type="text"
+            readOnly
+            className="w-4/5 h-12 bg-gray-100"
+          />
+        </div>
+      )}
 
-      <div className="flex flex-row gap-2 justify-between items-center">
-        <Label>Receiver account bank</Label>
-        <Combobox
-          choices={bankOptions}
-          value={receiverBankId ?? undefined}
-          onSelect={(bankId) => setReceiverBankId(bankId)}
-        />
-      </div>
+      {receiverName && (
+        <div className="flex gap-2 justify-end items-center">
+          <span className="font-semibold">Save as contact</span>
+          <Switch 
+            color="primary"
+            onChange={() => setIsSavedAsContact(!isSavedAsContact)}
+            defaultChecked={isSavedAsContact}
+          />
+        </div>
+      )}
 
-      <div className="flex flex-row gap-2 justify-between items-center">
-        <Label>Receiver account number</Label>
-        <Input
-          value={receiverAccountNumber}
-          onChange={(e) => setReceiverAccountNumber(e.target.value)}
-          type="text"
-          placeholder="Account number"
-          className="w-2/3"
-        />
-      </div>
-
-      <div className="flex flex-row gap-2 justify-between items-center">
+      <div className="flex gap-2 justify-between items-center">
         <Label>Transfer amount</Label>
         <Input
           value={transactionAmount}
           onChange={(e) => setTransactionAmount(e.target.value)}
+          onBlur={() => {
+            if (!transactionAmount) return;
+            const formattedAmount = parseFloat(transactionAmount).toLocaleString('vi-VN');
+            setTransactionAmount(formattedAmount + ' VNĐ');
+          }}
+          onClick={() => {
+            const amount = transactionAmount.replace(' VNĐ', '').replace(/\D/g, '');
+            setTransactionAmount(amount);
+          }}
           type="text"
           placeholder="Amount"
-          className="w-2/3"
+          className="w-4/5 h-12"
         />
       </div>
 
-      <div className="flex flex-row gap-2 justify-between items-center">
-        <Label>Message</Label>
+      <div className="flex gap-2 justify-between items-center">
+        <Label>Fee paid by</Label>
+        <div className="flex w-4/5 gap-10">
+          <label className="flex items-center">
+            <Input
+              type="radio"
+              value="sender"
+              checked={feePaidBy === "sender"}
+              onChange={(e) => setFeePaidBy(e.target.value)}
+              className="mr-2"
+            />
+            Sender
+          </label>
+          <label className="flex items-center">
+            <Input
+              type="radio"
+              value="recipient"
+              checked={feePaidBy === "recipient"}
+              onChange={(e) => setFeePaidBy(e.target.value)}
+              className="mr-2"
+            />
+            Recipient
+          </label>
+        </div>
+      </div>
+
+      <div className="flex gap-2 justify-between items-center">
+        <Label>Transfer message</Label>
         <Input
           value={transactionMessage}
           onChange={(e) => setTransactionMessage(e.target.value)}
           type="text"
           placeholder="Your message"
-          className="w-2/3 h-40"
+          className="w-4/5 h-12"
         />
       </div>
 
       <div className="flex gap-2 justify-center">
-        <Button type="submit" size={"freesize"} className="h-10 w-1/2">
+        <Button 
+          type="submit"
+          className="h-12 w-full"
+          style={{ backgroundColor: "#14B8A6", color: "#fff" }} 
+        >
           Transfer
         </Button>
       </div>
+
+      {/* Beneficiary Modal */}
+      <Dialog open={beneficiaryModalOpen} onClose={() => setBeneficiaryModalOpen(false)}>
+        <DialogTitle>Select Beneficiary</DialogTitle>
+        <DialogContent>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell><span className="font-semibold">Bank name</span></TableCell>
+                  <TableCell><span className="font-semibold">Account Number</span></TableCell>
+                  <TableCell><span className="font-semibold">Nickname</span></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {beneficiaries.map((beneficiary) => (
+                  <TableRow
+                    key={beneficiary.beneficiary_id}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    onClick={() => handleBeneficiarySelect(beneficiary)}
+                    className="cursor-pointer"
+                  >
+                    <TableCell component="th" scope="row">
+                      {beneficiary.bank_name}
+                    </TableCell>
+                    <TableCell>{beneficiary.account_number}</TableCell>
+                    <TableCell>{beneficiary.nickname}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBeneficiaryModalOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </form>
   );
 }
