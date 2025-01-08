@@ -103,7 +103,7 @@ export default function TransferPage() {
                   {user?.account_number?.replace(/(\d{4})(\d{4})(\d{3})/, "$1 $2 $3")} ({user?.fullname})
                 </span>
                 <span className="flex items-center font-semibold text-2xl">
-                  {`${user?.account_balance?.toLocaleString('vi-VN')} VNĐ`}
+                  {`${Number(user?.account_balance).toLocaleString('vi-VN')} VNĐ`}
                 </span>
               </div>
             </Card>

@@ -35,7 +35,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-4">
                 <Banknote size={20} color="#81dbe3" />
                 <span className="flex items-center font-semibold text-2xl">
-                  {isBalanceHidden ? "******** VNĐ" : `${user?.account_balance?.toLocaleString('vi-VN')} VNĐ`}
+                {isBalanceHidden ? "******** VNĐ" : `${Number(user?.account_balance).toLocaleString('vi-VN')} VNĐ`}
                 </span>
               </div>
               <Button variant="ghost" className="ml-2" onClick={toggleBalanceVisibility}>
