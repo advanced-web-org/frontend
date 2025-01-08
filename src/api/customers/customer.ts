@@ -53,13 +53,37 @@ export async function getCustomerByAccountNumber(accountNumber: string): Promise
     .then((response) => response.data);
 }
 
-export async function getCustomerNameWithAccountNumber(
+export async function getInternalCustomerNameWithAccountNumber(
   accountNumber: string
 ): Promise<{ fullName: string; accountNumber: string }> {
   try {
     const response = await api.get(`${import.meta.env.VITE_DOMAIN}/customers/account/${accountNumber}`)
 
     return response.data;
+  } catch {
+    return { fullName: "", accountNumber: "" };
+  }
+}
+
+export async function getExternalCustomerNameWithAccountNumber(
+  bankCode: string,
+  accountNumber: string
+): Promise<{ fullName: string; accountNumber: string }> {
+  try {
+    const response = await api.post(
+      `${import.meta.env.VITE_DOMAIN}/accounts/external-account-info`,
+      {
+        bankCode,
+        accountNumber
+      }
+    )
+
+    console.log(response.data);
+    
+    return {
+      fullName: response.data.fullname,
+      accountNumber: response.data.account_number
+    }
   } catch {
     return { fullName: "", accountNumber: "" };
   }

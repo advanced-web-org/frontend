@@ -10,6 +10,7 @@ import Paper from '@mui/material/Paper';
 import { Edit, Trash } from "lucide-react";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, MenuItem, Select } from "@mui/material";
 import { getBanks } from "@/api/banks/bank";
+import { getExternalCustomerNameWithAccountNumber, getInternalCustomerNameWithAccountNumber } from "@/api/customers/customer";
 
 export default function BeneficiaryPage() {
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
@@ -17,8 +18,9 @@ export default function BeneficiaryPage() {
   const [currentBeneficiary, setCurrentBeneficiary] = useState<Beneficiary | null>(null);
   const [nickname, setNickname] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [newBankId, setNewBankId] = useState<number>(1);
+  const [newBankName, setNewBankName] = useState("");
   const [newAccountNumber, setNewAccountNumber] = useState("");
+  const [newNickname, setNewNickname] = useState("");
   const [banks, setBanks] = useState<{ bank_id: number, bank_name: string }[]>([]);
 
   const fetchData = async () => {
@@ -29,6 +31,7 @@ export default function BeneficiaryPage() {
   const fetchBanks = async () => {
     const data = await getBanks();
     data.push({ bank_id: 1, bank_name: "Our bank" });
+    data.sort((a, b) => a.bank_id - b.bank_id);
     setBanks(data);
   };
 
@@ -61,16 +64,37 @@ export default function BeneficiaryPage() {
   };
 
   const handleCreate = async () => {
-    console.log('newBankId: ', newBankId);
-    console.log('newAccountNumber: ', newAccountNumber);
-    // await createBeneficiary({ bank_id: newBankId, account_number: newAccountNumber });
+    await createBeneficiary({
+      account_number: newAccountNumber,
+      bank_id: banks.find((bank) => bank.bank_name === newBankName)?.bank_id || 0,
+      nickname: newNickname
+    });
     setTimeout(() => {
       fetchData();
-      setNewBankId(1);
+      setNewBankName("");
       setNewAccountNumber("");
+      setNewNickname("");
       setCreateModalOpen(false);
     }, 1000);
   };
+
+  const fetchBeneficiaryInfo = async () => {
+    if (newBankName === "Our bank") {
+      const result = await getInternalCustomerNameWithAccountNumber(newAccountNumber);
+      if (!result) {
+        setNewNickname("");
+        return;
+      };
+      setNewNickname(result.fullName);
+    } else {
+      const result = await getExternalCustomerNameWithAccountNumber(newBankName, newAccountNumber);
+      if (!result) {
+        setNewNickname("");
+        return;
+      };
+      setNewNickname(result.fullName);
+    }
+  }
 
   return (
     <div className="container mx-auto p-2 flex flex-col justify-start gap-10">
@@ -162,13 +186,17 @@ export default function BeneficiaryPage() {
         <DialogContent className="flex flex-col gap-4">
           <Select
             fullWidth
-            value={newBankId}
-            onChange={(e) => setNewBankId(Number(e.target.value))}
+            value={newBankName}
+            onChange={(e) => {
+              setNewBankName(e.target.value);
+              setNewNickname("");
+              setNewAccountNumber("");
+            }}
             displayEmpty
           >
             <MenuItem value="" disabled>Select Bank</MenuItem>
             {banks.map((bank) => (
-              <MenuItem key={bank.bank_id} value={bank.bank_id}>{bank.bank_name}</MenuItem>
+              <MenuItem key={bank.bank_id} value={bank.bank_name}>{bank.bank_name}</MenuItem>
             ))}
           </Select>
           <TextField
@@ -178,7 +206,18 @@ export default function BeneficiaryPage() {
             fullWidth
             value={newAccountNumber}
             onChange={(e) => setNewAccountNumber(e.target.value)}
+            onBlur={fetchBeneficiaryInfo}
           />
+          {newNickname && (
+            <TextField
+              margin="dense"
+              label="Nickname"
+              type="text"
+              fullWidth
+              value={newNickname}
+              disabled
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateModalOpen(false)}>Cancel</Button>

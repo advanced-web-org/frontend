@@ -61,13 +61,15 @@ export default function TransferPage() {
       }
     });
 
-    try {
-      await createBeneficiary({
-        account_number: receiverAccountNumber,
-        bank_id: 1,
-      });
-    } catch (error) {
-      console.error(error)
+    if(isSavedAsContact) {
+      try {
+        await createBeneficiary({
+          account_number: receiverAccountNumber,
+          bank_id: 1,
+        });
+      } catch (error) {
+        console.error(error)
+      }
     }
 
     setShowSuccess(true);
