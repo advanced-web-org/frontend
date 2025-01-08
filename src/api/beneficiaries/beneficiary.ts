@@ -57,3 +57,45 @@ export async function updateBeneficiary(id: number, data: { nickname: string }):
 
   return response;
 }
+
+export async function getInternalBeneficiary(): Promise<Beneficiary[]> {
+  const response = await api
+    .post(`${import.meta.env.VITE_DOMAIN}/beneficiaries/internal`)
+    .then((res) => res.data);
+
+  const beneficiaries = response.map(
+    (item: {
+      beneficiary_id: string;
+      account_number: string;
+      nickname: string;
+      bank: { bank_name: string };
+    }) => ({
+      beneficiary_id: item.beneficiary_id,
+      account_number: item.account_number,
+      nickname: item.nickname,
+      bank_name: item.bank.bank_name, // Move 'bank_name' to the top level
+    })
+  );
+  return beneficiaries;
+}
+
+export async function getExternalBeneficiary(): Promise<Beneficiary[]> {
+  const response = await api
+    .get(`${import.meta.env.VITE_DOMAIN}/beneficiaries/external`)
+    .then((res) => res.data);
+
+  const beneficiaries = response.map(
+    (item: {
+      beneficiary_id: string;
+      account_number: string;
+      nickname: string;
+      bank: { bank_name: string };
+    }) => ({
+      beneficiary_id: item.beneficiary_id,
+      account_number: item.account_number,
+      nickname: item.nickname,
+      bank_name: item.bank.bank_name, // Move 'bank_name' to the top level
+    })
+  );
+  return beneficiaries;
+}
