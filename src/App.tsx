@@ -11,7 +11,7 @@ import UnauthorizePage from "./pages/common/unauthorize";
 import UnImplementPage from "./pages/common/unImplement";
 import Layout from "./pages/customer/components/layout";
 import BeneficiaryPage from "./pages/customer/pages/Beneficienary/beneficiary";
-import { DashboardPage } from "./pages/customer/pages/dashboard";
+import DashboardPage from "./pages/customer/pages/dashboard";
 import HistoryPage from "./pages/customer/pages/history";
 import TransferPage from "./pages/customer/pages/Transfer/transfer";
 import EmpDashboardPage from "./pages/employee/dashboard";
@@ -92,7 +92,7 @@ function App() {
         <Route path="/employee/dashboard" element={<EmpDashboardPage />} />
       </Route>
       <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
-        <Route path="/admin/home" element={<h1>Admin home</h1>} />
+        <Route path="/admin/dashboard" element={<h1>Admin home</h1>} />
       </Route>
 
       <Route path="*" element={<UnImplementPage />} />

@@ -8,7 +8,7 @@ export default function Layout() {
     <SidebarProvider>
       <CustomerSidebar />
 
-      <main className="p-3 w-screen">
+      <main className="p-3 w-screen bg-gray-50">
         <SidebarTrigger />
         <Outlet />
         <Toaster />

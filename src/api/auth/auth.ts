@@ -51,7 +51,6 @@ export async function signin({ username, password }: IAuth): Promise<any> {
   localStorage.setItem("refresh_token", responseData.refreshToken);
   localStorage.setItem("username", responseData.username);
 
-  // Map the response data directly into the `User` object
   return {
     id: responseData.id,
     fullname: responseData.fullname,
