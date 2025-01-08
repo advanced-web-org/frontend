@@ -1,4 +1,4 @@
-import { Beneficiary, getBeneficiaries, deleteBeneficiary, updateBeneficiary } from "@/api/beneficiaries/beneficiary";
+import { Beneficiary, getBeneficiaries, deleteBeneficiary, updateBeneficiary, createBeneficiary } from "@/api/beneficiaries/beneficiary";
 import { useEffect, useState } from "react";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,21 +8,33 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Edit, Trash } from "lucide-react";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, MenuItem, Select } from "@mui/material";
+import { getBanks } from "@/api/banks/bank";
 
 export default function BeneficiaryPage() {
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentBeneficiary, setCurrentBeneficiary] = useState<Beneficiary | null>(null);
   const [nickname, setNickname] = useState("");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [newBankId, setNewBankId] = useState<number>(1);
+  const [newAccountNumber, setNewAccountNumber] = useState("");
+  const [banks, setBanks] = useState<{ bank_id: number, bank_name: string }[]>([]);
 
   const fetchData = async () => {
     const data = await getBeneficiaries();
     setBeneficiaries(data);
   };
 
+  const fetchBanks = async () => {
+    const data = await getBanks();
+    data.push({ bank_id: 1, bank_name: "Our bank" });
+    setBanks(data);
+  };
+
   useEffect(() => {
     fetchData();
+    fetchBanks();
   }, []);
 
   const handleDelete = async (id: number) => {
@@ -48,12 +60,31 @@ export default function BeneficiaryPage() {
     }
   };
 
+  const handleCreate = async () => {
+    console.log('newBankId: ', newBankId);
+    console.log('newAccountNumber: ', newAccountNumber);
+    // await createBeneficiary({ bank_id: newBankId, account_number: newAccountNumber });
+    setTimeout(() => {
+      fetchData();
+      setNewBankId(1);
+      setNewAccountNumber("");
+      setCreateModalOpen(false);
+    }, 1000);
+  };
+
   return (
     <div className="container mx-auto p-2 flex flex-col justify-start gap-10">
       {/* Header */}
-      <div className="">
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Beneficiaries</h1>
       </div>
+      {/* Action buttons */}
+      <div className="flex justify-end px-10">
+        <Button variant="contained" color="primary" onClick={() => setCreateModalOpen(true)}>
+          Add Beneficiary
+        </Button>
+      </div>
+      
       {/* Table */}
       <div className="px-10">
         <TableContainer component={Paper}>
@@ -96,7 +127,12 @@ export default function BeneficiaryPage() {
         </TableContainer>
       </div>
       {/* Edit Modal */}
-      <Dialog open={editModalOpen} onClose={() => setEditModalOpen(false)}>
+      <Dialog 
+        open={editModalOpen} 
+        onClose={() => setEditModalOpen(false)}
+        fullWidth={true}
+        maxWidth="sm"
+      >
         <DialogTitle>Edit Beneficiary</DialogTitle>
         <DialogContent>
           <TextField
@@ -112,6 +148,41 @@ export default function BeneficiaryPage() {
         <DialogActions>
           <Button onClick={() => setEditModalOpen(false)}>Cancel</Button>
           <Button onClick={handleSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Create Modal */}
+      <Dialog 
+        open={createModalOpen} 
+        onClose={() => setCreateModalOpen(false)}
+        fullWidth={true}
+        maxWidth="sm"
+      >
+        <DialogTitle>Add New Beneficiary</DialogTitle>
+        <DialogContent className="flex flex-col gap-4">
+          <Select
+            fullWidth
+            value={newBankId}
+            onChange={(e) => setNewBankId(Number(e.target.value))}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>Select Bank</MenuItem>
+            {banks.map((bank) => (
+              <MenuItem key={bank.bank_id} value={bank.bank_id}>{bank.bank_name}</MenuItem>
+            ))}
+          </Select>
+          <TextField
+            margin="dense"
+            label="Account Number"
+            type="text"
+            fullWidth
+            value={newAccountNumber}
+            onChange={(e) => setNewAccountNumber(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCreateModalOpen(false)}>Cancel</Button>
+          <Button onClick={handleCreate}>Create</Button>
         </DialogActions>
       </Dialog>
     </div>
