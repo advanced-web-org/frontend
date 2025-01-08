@@ -10,6 +10,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -19,6 +20,8 @@ import {
 } from "@/components/ui/sidebar";
 
 import { NavLink, useLocation } from "react-router-dom";
+import { NavUser } from "@/components/nav-user";
+import { useUserStore } from "@/stores/userStore";
 
 // Menu items.
 const items = [
@@ -56,6 +59,7 @@ const items = [
 
 export function CustomerSidebar() {
   const location = useLocation();
+  const user = useUserStore((state) => state.user);
 
   return (
     <Sidebar className="justify-center items-center">
@@ -89,6 +93,9 @@ export function CustomerSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={{ name: user?.fullname, email: user?.email }} />
+      </SidebarFooter>
     </Sidebar>
   );
 }
