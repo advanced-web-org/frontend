@@ -55,7 +55,7 @@ function App() {
               {userStore?.role === "employee" && (
                 <Navigate to="/employee/home" />
               )}
-              {userStore?.role === "admin" && <Navigate to="/admin/home" />}
+              {userStore?.role === "admin" && <Navigate to="/admin/staffs" />}
             </>
           ) : (
             <Navigate to="/auth/login" />
@@ -77,23 +77,20 @@ function App() {
         </Route>
       </Route>
 
-      <Route path="/employee/home" element={<h1>Emp home</h1>} />
-      {/* <Route element={<ProtectedRoutes allowedRoles={"employee"} />}> */}
-      {/* </Route> */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route path="staffs" element={<StaffPage />} />
-        <Route path="transactions" element={<TransactionPage />} />
-        {/* <Route path="transactions" element={<TransactionPage/>}/> */}
+      <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          {/* <Route path="dashboard" element={<StaffPage />} /> */}
+          <Route path="staffs" element={<StaffPage />} />
+          <Route path="transactions" element={<TransactionPage />} />
+        </Route>
       </Route>
-      {/* <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
-      </Route> */}
 
       <Route element={<ProtectedRoutes allowedRoles={"employee"} />}>
         <Route path="/employee/dashboard" element={<EmpDashboardPage />} />
       </Route>
-      <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
+      {/* <Route element={<ProtectedRoutes allowedRoles={"admin"} />}>
         <Route path="/admin/dashboard" element={<h1>Admin home</h1>} />
-      </Route>
+      </Route> */}
 
       <Route path="*" element={<UnImplementPage />} />
     </Routes>

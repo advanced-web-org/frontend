@@ -28,7 +28,7 @@ import { DataTable } from "../components/tables/table";
 
 import { Label, Pie, PieChart } from "recharts";
 
-export default function SimpleLineChart() {
+export default function TransactionPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(2020, 0, 20),
     to: new Date(),
@@ -87,6 +87,7 @@ export default function SimpleLineChart() {
 
   useEffect(() => {
     getExternalTransactions().then((transactions) => {
+      console.log(transactions);
       setData(transactions);
     });
 
@@ -120,7 +121,7 @@ export default function SimpleLineChart() {
       setTotalAmount(chartData.reduce((acc, data) => acc + data.amount, 0));
       setHighestAmount(Math.max(...chartData.map((data) => data.amount), 0));
       setLowestAmount(
-        Math.min(...chartData.map((data) => data.amount), Infinity)
+        Math.min(...chartData.map((data) => data.amount), 0)
       );
     });
   }, []);

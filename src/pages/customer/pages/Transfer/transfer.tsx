@@ -47,7 +47,7 @@ export default function TransferPage() {
           to_bank_id: 1,
           to_account_number: receiverAccountNumber,
           transaction_type: "transaction",
-          transaction_amount: Number(transactionAmount.replace(' VNĐ', '').replace(/\D/g, '')),
+          transaction_amount: Number(transactionAmount.replace(' USD', '').replace(/\D/g, '')),
           transaction_message: transactionMessage,
           fee_payer: feePaidBy === "sender" ? "from" : "to",
           fee_amount: 1000
@@ -62,7 +62,7 @@ export default function TransferPage() {
           to_bank_id: selectedBank,
           to_account_number: receiverAccountNumber,
           transaction_type: "transaction",
-          transaction_amount: Number(transactionAmount.replace(' VNĐ', '').replace(/\D/g, '')),
+          transaction_amount: Number(transactionAmount.replace(' USD', '').replace(/\D/g, '')),
           transaction_message: transactionMessage,
           fee_payer: feePaidBy === "sender" ? "from" : "to",
           fee_amount: 1000
@@ -115,7 +115,7 @@ export default function TransferPage() {
                   {user?.account_number?.replace(/(\d{4})(\d{4})(\d{3})/, "$1 $2 $3")} ({user?.fullname})
                 </span>
                 <span className="flex items-center font-semibold text-2xl">
-                  {`${Number(user?.account_balance).toLocaleString('vi-VN')} VNĐ`}
+                  {`${Number(user?.account_balance).toLocaleString('vi-VN')} USD`}
                 </span>
               </div>
             </Card>

@@ -41,7 +41,12 @@ export function LoginForm() {
     try {
       const user = await auth.signin({ username, password }); // Call the signin function from the AuthContext
       if (user) {
-        navigate(`/${user.role}/dashboard`); // Redirect to the user's home page based on their role
+        if (user.role == 'admin') {
+          navigate('/admin/staffs');
+        }
+        else {
+          navigate(`/${user.role}/dashboard`); // Redirect to the user's home page based on their role
+        }
       }
     } catch (err) {
       setError("Invalid username number or password. Please try again."); // Display error message

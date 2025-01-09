@@ -156,10 +156,10 @@ export default function ExternalForm({
           onBlur={() => {
             if (!transactionAmount) return;
             const formattedAmount = parseFloat(transactionAmount).toLocaleString('vi-VN');
-            setTransactionAmount(formattedAmount + ' VNĐ');
+            setTransactionAmount(formattedAmount + ' USD');
           }}
           onClick={() => {
-            const amount = transactionAmount.replace(' VNĐ', '').replace(/\D/g, '');
+            const amount = transactionAmount.replace(' USD', '').replace(/\D/g, '');
             setTransactionAmount(amount);
           }}
           type="text"
