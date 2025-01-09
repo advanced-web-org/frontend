@@ -21,10 +21,52 @@ export async function getTransactions(): Promise<Transaction[]> {
   const response = await api
     .get(`${import.meta.env.VITE_DOMAIN}/transactions`)
     .then((res) => res.data);
+  console.log(response, "response");
+
+  // Change the amount of sent transactions to negative
+  response.sendTransactions.forEach((transaction: any) => {
+    transaction.transaction_amount =
+      "- " + transaction.transaction_amount.toString() + " USD";
+  });
+
+  // Change the amount of received transactions to positive
+  response.receivedTransactions.forEach((transaction: any) => {
+    transaction.transaction_amount =
+      "+ " + transaction.transaction_amount.toString() + " USD";
+  });
+
   const transactions = [
     ...response.receivedTransactions,
     ...response.sendTransactions,
   ];
+
+  // Change the time format
+  transactions.forEach((transaction) => {
+    transaction.transaction_date = new Date(
+      transaction.transaction_date
+    ).toLocaleString();
+  });
+
+  // Add bank name = Bank B if bank_id = 2
+  transactions.forEach((transaction) => {
+    if (transaction.from_bank_id === 2) {
+      transaction.from_bank_name = "Bank B";
+    }
+    if (transaction.to_bank_id === 2) {
+      transaction.to_bank_name = "Bank B";
+    }
+  });
+
+  // Add bank name = Speechless Bank if bank_id = 1
+  transactions.forEach((transaction) => {
+    if (transaction.from_bank_id === 1) {
+      transaction.from_bank_name = "Speechless Bank";
+    }
+    if (transaction.to_bank_id === 1) {
+      transaction.to_bank_name = "Speechless Bank";
+    }
+  });
+
   return transactions;
 }
 
@@ -47,15 +89,20 @@ export async function getExternalTransactions(): Promise<Transaction[]> {
     e_signal: transaction.e_signal,
     transaction_date: transaction.transaction_date,
     from_bank_name: transaction.from_bank.bank_name,
-    to_bank_name: transaction.to_bank.bank_name
+    to_bank_name: transaction.to_bank.bank_name,
   }));
 
   return transactions;
 }
 
-export async function getExternalBalance(externalBankId?: number): Promise<object[]> {
+export async function getExternalBalance(
+  externalBankId?: number
+): Promise<object[]> {
   const response = await api
-    .get(`${import.meta.env.VITE_DOMAIN}/transactions/external/balance/` + (externalBankId ? externalBankId.toString() : ""))
+    .get(
+      `${import.meta.env.VITE_DOMAIN}/transactions/external/balance/` +
+        (externalBankId ? externalBankId.toString() : "")
+    )
     .then((res) => res.data);
   return response;
 }
@@ -67,17 +114,21 @@ export async function requestOtpForTransaction(): Promise<any> {
 
   return {
     otpToken: response.otpToken,
-  }
+  };
 }
 
-export async function verifyOtpForInternalTransaction(otpToken: string, otp: string, payload: any): Promise<any> {
+export async function verifyOtpForInternalTransaction(
+  otpToken: string,
+  otp: string,
+  payload: any
+): Promise<any> {
   const response = await api
     .post(`${import.meta.env.VITE_DOMAIN}/transactions/verify_otp`, {
       otpToken,
       otp,
-      transaction: payload
+      transaction: payload,
     })
     .then((res) => res.data);
-  
+
   return response;
 }
