@@ -67,7 +67,7 @@ const DebtListItem = ({ debt, tab }: { debt: Debt; tab: Tab }) => {
               <>
                 <Button
                   className={getButtonClass()}
-                  onClick={() => handleInitiatePayment(debt.debtor_id)}
+                  onClick={() => handleInitiatePayment(debt.debt_id)}
                   disabled={isLoading}
                 >
                   {isLoading ? <l-ring size="20" stroke="2" speed="2" color="white" /> : "Pay"}

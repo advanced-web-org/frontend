@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { initiateDebtPayment, payDebt, InitiateDebtPaymentDto } from "../api/debt.api";
-import { userOtpStore } from "@/stores/otpStore";
 import { toast } from "sonner";
-import { set } from "date-fns";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux.hook";
+import { selectOtpToken, setOtpToken } from "@/slice/otp.slice";
 
 export const usePayment = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,7 +11,8 @@ export const usePayment = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null); // Store error messages
   const queryClient = useQueryClient();
-  const setOtpToken = userOtpStore((state) => state.setOtpToken);
+  const dispatch = useAppDispatch();
+  const otpToken = useAppSelector(selectOtpToken); // Get OTP token from Redux store
 
   const payDebtMutation = useMutation({
     mutationFn: ({ debtId, otpCode, otpToken }: { debtId: number; otpCode: string; otpToken: string }) =>
@@ -29,11 +30,11 @@ export const usePayment = () => {
     },
   });
 
-  const handleInitiatePayment = async (debtorId: number) => {
+  const handleInitiatePayment = async (debtId: number) => {
     setIsLoading(true);
     try {
-      const data: InitiateDebtPaymentDto = await initiateDebtPayment(debtorId);
-      setOtpToken(data.otpToken);
+      const data: InitiateDebtPaymentDto = await initiateDebtPayment(debtId);
+      dispatch(setOtpToken(data.otpToken)); // Dispatch action to set OTP token
       setIsDialogOpen(true);
     } catch (error) {
       console.error("Failed to initiate payment:", error);
@@ -45,7 +46,6 @@ export const usePayment = () => {
 
   const handleConfirmPayment = async (debtId: number, otpCode: string) => {
     try {
-      const otpToken = userOtpStore.getState().otpToken;
       if (!otpToken) {
         throw new Error("OTP token is missing");
       }
@@ -53,7 +53,6 @@ export const usePayment = () => {
       await payDebtMutation.mutateAsync({ debtId, otpCode, otpToken });
     } catch (error) {
       console.error("Failed to confirm payment:", error);
-      // throw error;
     } finally {
       setIsPaying(false);
     }
